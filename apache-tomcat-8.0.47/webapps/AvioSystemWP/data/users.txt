@@ -1,3 +1,0 @@
-1|admin|admin|Marko|Markovic|535252|m@gmail.com|slika.jpg|2
-2|user1|1234|Jovan|Lakovic|123123|j@gmail.com|slika.jpg|0
-3|user2|1234|Nemanja|Nemanjic|122312|n@gmail.com|slika.jpg|0

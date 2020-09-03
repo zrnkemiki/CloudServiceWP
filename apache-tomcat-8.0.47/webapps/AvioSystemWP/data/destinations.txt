@@ -1,8 +1,0 @@
-1|Boston|USA|Logan International Airport|BOS|1 Harborside Dr|slika.jpg|0
-2|New York|USA|J.F. Kenedy|JFK|Queens, NY 11430|slika.jpg|0
-3|Belgrade|Serbia|Nikola Tesla Airport|BEG|Aerodrom Beograd 59|slika.jpg|0
-4|Los Angeles|USA|LA International Airport|LAX|1 World Way, Los Angeles, CA 90045|slika.jpg|0
-5|Zurich|Switzerland|Zurich International Airport|ZRH|8058 Zurich-Flughafen|slika.jpg|0
-6|Beijing|China|Bejing Capital International Airport|PEK|Shunyi, Beijing|slika.jpg|0
-7|Sydney|Australia|Sydney Airport|SYD|Sydney NSW 2020|slika.jpg|0
-8|Cape Town|South Africa|Cape Town International Airport|CPT|Matroosfontein, Cape Town, 7490|slika.jpg|0
