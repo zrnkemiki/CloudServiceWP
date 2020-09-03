@@ -62,8 +62,12 @@ public class UserService {
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		} else {
 			Users allUsers = getUsers(ctx);
+			User u = allUsers.getUsers().get(email);
 			allUsers.getUsers().remove(email);
 			saveUsers(ctx, allUsers);
+			OrganizationService.removeUserFromOrganization(u, ctx);
+			
+			
 
 		}
 		return Response.status(Response.Status.OK).build();

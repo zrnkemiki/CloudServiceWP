@@ -9,7 +9,6 @@ public class Disk {
 	private Organization organization;
 	private DiskType diskType;
 	private int capacity;
-	private VirtualMachine vm;
 
 	public Disk() {
 		super();
@@ -23,7 +22,6 @@ public class Disk {
 		this.organization = organization;
 		this.diskType = diskType;
 		this.capacity = capacity;
-		this.vm = vm;
 	}
 
 	public int getId() {
@@ -66,12 +64,5 @@ public class Disk {
 		this.capacity = capacity;
 	}
 
-	public VirtualMachine getVm() {
-		return vm;
-	}
-
-	public void setVm(VirtualMachine vm) {
-		this.vm = vm;
-	}
 
 }

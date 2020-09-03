@@ -11,6 +11,7 @@ import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Response;
 
 import dto.OrganizationDTO;
 import enums.UserType;
@@ -19,7 +20,6 @@ import model.Organizations;
 import model.User;
 
 public class OrganizationService {
-	
 
 	private static BufferedWriter bw;
 	private static FileWriter fw;
@@ -68,8 +68,6 @@ public class OrganizationService {
 		}
 		return organizations;
 	}
-	
-	
 
 	public static void saveOrganizations(ServletContext ctx, Organizations allOrganizations) {
 		String path = ctx.getRealPath("") + "data/organizations.txt".replace("/", System.getProperty("file.separator"));
@@ -90,15 +88,38 @@ public class OrganizationService {
 		ctx.removeAttribute("organizations");
 	}
 
-	public static Organization getOrganizationID(int id) {
-
-		return null;
+	public static Organization getOrganizationByID(int id, ServletContext ctx) {
+		Organizations organizations = getOrganizations(ctx);
+		Organization organization = organizations.getOrganizations().get(id);
+		return organization;
 	}
 
 	// SUPER ADMIN:
-	public static Organization addOrganization(OrganizationDTO dto) {
+	public static Response addOrganization(OrganizationDTO dto, HttpServletRequest request, ServletContext ctx) {
+		User u = (User) request.getSession().getAttribute("loggedUser");
+		if (u.getUserType() != UserType.SUPERADMIN) {
+			return Response.status(Response.Status.FORBIDDEN).build();
+		}
+		Organization org = new Organization(dto);
+		Organizations organizations = getOrganizations(ctx);
+		org.setId(organizations.getOrganizations().size() + 1);
+		organizations.getOrganizations().put(org.getId(), org);
+		saveOrganizations(ctx, organizations);
 
-		return null;
+		return Response.status(Response.Status.CREATED).build();
+	}
+
+	public static void removeUserFromOrganization(User u, ServletContext ctx) {
+		Organization organization = getOrganizationByID(u.getOrganization().getId(), ctx);
+		for (int i = 0; i < organization.getUsers().size(); i++) {
+			if (organization.getUsers().get(i) == u.getId()) {
+				organization.getUsers().remove(i);
+			}
+		}
+		Organizations organizations = getOrganizations(ctx);
+		organizations.getOrganizations().put(organization.getId(), organization);
+		saveOrganizations(ctx, organizations);
+
 	}
 
 	// SUPER ADMIN:

@@ -17,16 +17,13 @@ public class VirtualMachines {
 		this.vms = vms;
 	}
 
-	public HashMap<Integer, VirtualMachine> getVirtualMachinesAsMap() {
+	public HashMap<Integer, VirtualMachine> getVms() {
 		return vms;
 	}
 
 	public void setVms(HashMap<Integer, VirtualMachine> vms) {
 		this.vms = vms;
 	}
-	
-	public List<VirtualMachine> getVirtualMachinesAsList() {
-		return this.vms.values().stream().collect(Collectors.toList());
-	}
+
 	
 }
