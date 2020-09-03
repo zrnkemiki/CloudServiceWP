@@ -1,4 +1,0 @@
-1|admin|1234|Marko|Markovic|555-555|marko@gmail.com|slika.jpg|0|null|2
-2|admin2|1234|Nemanja|Nemanjic|666-666|nnemanjic@gmail.com|slika.jpg|0|null|2
-3|volonter1|1234|Ana|Anic|123-123|anic@gmail.com|slika.jpg|1|1|0
-4|volonter2|1234|Nikola|Nikolic|242-242|nikolic@gmail.com|slika.jpg|1|2|0
