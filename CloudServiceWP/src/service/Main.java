@@ -40,6 +40,12 @@ public class Main {
 		Organizations organizations = jsonb.fromJson(s, Organizations.class);
 		System.out.println(organizations.getOrganizations().size());
 		
+		
+		String path = "/data/users.txt".replace("/", System.getProperty("file.separator"));
+		System.out.println(path);
+		System.out.println(System.getProperty("file.separator"));
+		System.out.println(path);
+		
 
 	}
 

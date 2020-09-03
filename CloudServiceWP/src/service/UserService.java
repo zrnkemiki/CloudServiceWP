@@ -110,7 +110,7 @@ public class UserService {
 	}
 
 	private static Users loadUsers(String path) {
-		path += "/data/users.txt";
+		path += "data/users.txt".replace("/", System.getProperty("file.separator"));
 		BufferedReader in = null;
 		Users users = null;
 		try {
@@ -157,8 +157,8 @@ public class UserService {
 	}
 
 	public static void saveUsers(ServletContext ctx, Users allUsers) {
-		String path = ctx.getRealPath("") + "/data/users.txt";
-
+		String path = ctx.getRealPath("") + "data/users.txt".replace("/", System.getProperty("file.separator"));
+		System.out.println("Ovo je putanja: " + path);
 		String data = "";
 		Jsonb jsonb = JsonbBuilder.create();
 		data = jsonb.toJson(allUsers);

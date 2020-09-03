@@ -47,7 +47,7 @@ public class OrganizationService {
 	}
 
 	public static Organizations loadOrganizations(String path) {
-		path += "/data/organizations.txt";
+		path += "data/organizations.txt".replace("/", System.getProperty("file.separator"));
 		BufferedReader in = null;
 		Organizations organizations = null;
 		try {
@@ -72,7 +72,7 @@ public class OrganizationService {
 	
 
 	public static void saveOrganizations(ServletContext ctx, Organizations allOrganizations) {
-		String path = ctx.getRealPath("") + "/data/organizations.txt";
+		String path = ctx.getRealPath("") + "data/organizations.txt".replace("/", System.getProperty("file.separator"));
 		
 		String data = "";
 		Jsonb jsonb = JsonbBuilder.create();
