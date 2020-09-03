@@ -1,0 +1,5 @@
+127.0.0.1 - - [03/Sep/2020:04:01:46 +0200] "GET / HTTP/1.1" 200 11452
+0:0:0:0:0:0:0:1 - - [03/Sep/2020:04:02:49 +0200] "GET /CloudServiceWP/index.html HTTP/1.1" 200 892
+0:0:0:0:0:0:0:1 - - [03/Sep/2020:04:02:49 +0200] "GET /favicon.ico HTTP/1.1" 200 21630
+0:0:0:0:0:0:0:1 - - [03/Sep/2020:04:02:49 +0200] "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 1058
+0:0:0:0:0:0:0:1 - - [03/Sep/2020:04:02:49 +0200] "GET /apple-touch-icon.png HTTP/1.1" 404 1034
