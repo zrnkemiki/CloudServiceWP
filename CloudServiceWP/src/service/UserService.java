@@ -35,6 +35,7 @@ public class UserService {
 		if (logged.getUserType() == UserType.ADMIN) {
 			dto.setOrganization(logged.getOrganization());
 		}
+		//dto.setOrganization(OrganizationService.getOrganizationID(dto.getOrganizationId()));
 		User newUser = new User(dto);
 		Users allUsers = getUsers(ctx);
 		newUser.setId(allUsers.getUsers().size() + 1);
@@ -73,9 +74,38 @@ public class UserService {
 	}
 
 	// korisnik menja svoj profil
-	public static User editUserProfile() {
+	public static Response editUserProfile(UserDTO edited, String email, ServletContext ctx, HttpServletRequest request) {
+		Users allUsers = getUsers(ctx);
 		
-		return null;
+		if (allUsers.getUsers().containsKey(edited.getEmail())) {
+			// ako postoji user sa tim email-om hendlaj u error na frontu poruku
+			return Response.status(Response.Status.CONFLICT).build();
+		}
+		
+		// ako neko polje nije popunjeno, vrati gresku
+		if (edited.getFirstName().equals("") || edited.getLastName().equals("") || edited.getPassword().equals("")) {
+			return Response.status(Response.Status.BAD_REQUEST).build();
+		}
+		
+		User userForEdit = getUserByEmail(email, ctx);
+		
+		if (userForEdit == null) {
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
+		
+		userForEdit.setEmail(edited.getEmail());
+		userForEdit.setFirstName(edited.getFirstName());
+		userForEdit.setLastName(edited.getLastName());
+		userForEdit.setPassword(edited.getPassword());
+		
+		allUsers.getUsers().remove(email);
+		allUsers.getUsers().put(userForEdit.getEmail(), userForEdit);
+		saveUsers(ctx, allUsers);
+		
+		request.getSession().removeAttribute("loggedUser");
+		request.getSession().setAttribute("loggedUser", userForEdit);
+		
+		return Response.status(Response.Status.OK).build();
 	}
 
 	public static User getLoggedUser(HttpServletRequest request) {
@@ -107,6 +137,12 @@ public class UserService {
 		return users;
 
 	}
+	
+	public static User getUserByEmail(String email, ServletContext ctx) {
+		Users allUsers = getUsers(ctx);
+		User found = allUsers.getUsers().get(email);
+		return found;
+	}
 
 	// SUPER ADMIN:
 	// prikaz svih korisnika iz svih organizacija
@@ -121,7 +157,6 @@ public class UserService {
 			ctx.setAttribute("users", allUsers);
 		}
 
-		System.out.println("Ovo je u userService" + allUsers.getUsers().size());
 		return allUsers;
 	}
 

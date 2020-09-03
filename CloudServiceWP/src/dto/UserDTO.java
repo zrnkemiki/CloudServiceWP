@@ -1,6 +1,5 @@
 package dto;
 
-import enums.UserType;
 import model.Organization;
 
 public class UserDTO {
