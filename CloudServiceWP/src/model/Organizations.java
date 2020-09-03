@@ -17,20 +17,17 @@ public class Organizations {
 		this.organizations = organizations;
 	}
 
-	public HashMap<Integer, Organization> getOrganizationsAsMap() {
+	public HashMap<Integer, Organization> getOrganizations() {
 		return organizations;
 	}
 
 	public void setOrganizations(HashMap<Integer, Organization> organizations) {
 		this.organizations = organizations;
 	}
-	
 	/*
-	 *  vraca sve organizacije iz mape u formatu ArrayList
-	 */
 	public List<Organization> getOrganizationsAsList() {
 		return this.organizations.values().stream().collect(Collectors.toList());
 	}
-	
+	*/
 	
 }

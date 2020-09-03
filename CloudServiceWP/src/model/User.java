@@ -1,5 +1,6 @@
 package model;
 
+import dto.UserDTO;
 import enums.UserType;
 
 public class User {
@@ -11,16 +12,31 @@ public class User {
 	private String lastName;
 	private String phone;
 	private String picture;
-	private int organizationId;
+	private Organization organization;
 	private UserType userType;
 
 	public User() {
-		super();
-		// TODO Auto-generated constructor stub
+
+	}
+
+	public User(UserDTO userDto) {
+		this.email = userDto.getEmail();
+		this.password = userDto.getPassword();
+		this.firstName = userDto.getFirstName();
+		this.lastName = userDto.getLastName();
+		this.phone = userDto.getPhone();
+		this.picture = userDto.getPicture();
+		this.organization = userDto.getOrganization();
+		if(userDto.getUserType() == 1) {
+			this.userType = UserType.ADMIN;
+		}
+		else if(userDto.getUserType() == 2) {
+			this.userType = UserType.USER;
+		}
 	}
 
 	public User(int id, String email, String password, String firstName, String lastName, String phone, String picture,
-			int organizationId, UserType userType) {
+			Organization organization, UserType userType) {
 		super();
 		this.id = id;
 		this.email = email;
@@ -29,7 +45,7 @@ public class User {
 		this.lastName = lastName;
 		this.phone = phone;
 		this.picture = picture;
-		this.organizationId = organizationId;
+		this.organization = organization;
 		this.userType = userType;
 	}
 
@@ -89,12 +105,12 @@ public class User {
 		this.picture = picture;
 	}
 
-	public int getOrganization() {
-		return organizationId;
+	public Organization getOrganization() {
+		return organization;
 	}
 
-	public void setOrganization(int organizationId) {
-		this.organizationId = organizationId;
+	public void setOrganization(Organization organization) {
+		this.organization = organization;
 	}
 
 	public UserType getUserType() {
@@ -104,5 +120,7 @@ public class User {
 	public void setUserType(UserType userType) {
 		this.userType = userType;
 	}
+
+	
 
 }

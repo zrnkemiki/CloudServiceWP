@@ -8,15 +8,15 @@ public class Organization {
 	private String name;
 	private String about;
 	private String logo;
-	private List<User> users;
-	private List<VirtualMachine> vms;
+	private List<Integer> users;
+	private List<Integer> vms;
 
 	public Organization() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public Organization(int id, String name, String about, String logo, List<User> users, List<VirtualMachine> vms) {
+	public Organization(int id, String name, String about, String logo, List<Integer> users, List<Integer> vms) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -58,20 +58,24 @@ public class Organization {
 		this.logo = logo;
 	}
 
-	public List<User> getUsers() {
+	public List<Integer> getUsers() {
 		return users;
 	}
 
-	public void setUsers(List<User> users) {
+	public void setUsers(List<Integer> users) {
 		this.users = users;
 	}
 
-	public List<VirtualMachine> getVms() {
+	public List<Integer> getVms() {
 		return vms;
 	}
 
-	public void setVms(List<VirtualMachine> vms) {
+	public void setVms(List<Integer> vms) {
 		this.vms = vms;
 	}
+
+	
+	
+	
 
 }

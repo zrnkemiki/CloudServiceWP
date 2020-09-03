@@ -1,0 +1,1 @@
+{"organizations":{"0":{"about":"organizacija","id":0,"logo":"organizacija","name":"organizacija","users":[],"vms":[]}}}
