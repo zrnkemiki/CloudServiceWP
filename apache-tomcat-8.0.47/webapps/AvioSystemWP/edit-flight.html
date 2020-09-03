@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Edit Flight</title>
+	<meta charset="ISO-8859-1">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="js/printNavBar.js"></script>
+
+	<link rel="stylesheet" href="css/authentication.css">
+	<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="index.html">Home</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li><a href="admin-profile.html">Profile</a></li>
+        <li><a href="add-destination.html">New Destination</a></li>
+        <li><a href="edit-destination.html">Edit Destination</a></li>
+        <li><a href="archive-destination.html">Archive Destination</a></li>
+        <li><a href="add-flight.html">New Flight</a></li>
+        <li class="active"><a href="edit-flight.html">Edit Flight</a></li>
+        <li><a href="delete-flight.html">Delete Flight</a></li>
+        <li><a href="activate-user.html">Activate User</a></li>
+        <li><a href="block-user.html">Block User</a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a onclick="logout()" id="logout-btn"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid text-center">    
+  <div class="row content">
+    <div class="col-sm-8 text-left"> 
+      <div class="container">
+      <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        <div class="panel panel-login">
+          <div class="panel-heading">
+            <h3>Edit Flight</h3>
+            <hr>
+          </div>
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-lg-12">
+                <form id="flight-form" role="form" style="display: block;">
+                  <div class="form-group">
+                    <label for="select-flight">Select flight:</label>
+                    <select class="form-control" id="flight">
+                      
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="select-from-dest">From destination:</label>
+                    <select class="form-control" id="from-destination">
+                      
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="select-to-dest">To destination:</label>
+                    <select class="form-control" id="to-destination">
+                      
+                    </select>
+                  </div>                  
+                  <div class="form-group">
+                    <input type="text" name="airplane-model" id="airplane-model" tabindex="1" class="form-control" placeholder="Airplane model" value="">
+                  </div>
+                  <div class="form-group">
+                    <input type="text" name="price" id="price" tabindex="1" class="form-control" placeholder="Basic price" value="">
+                  </div>
+                  <div class="col-lg-6">
+                  	<div class="form-group">
+                  		<input type="number" name="first-class-seats" id="first-class-seats" tabindex="1" class="form-control" placeholder="First class seats number" value="" min="0" max="150">
+                  	</div>
+                  </div>
+                  <div class="col-lg-6">
+                  	<div class="form-group">
+                  		<input type="number" name="business-class-seats" id="business-class-seats" tabindex="1" class="form-control" placeholder="Business class seats number" value="" min="0" max="150">
+                  	</div>
+                  </div>
+                  <div class="col-lg-6">
+                  	<div class="form-group">
+                  		<input type="number" name="economy-class-seats" id="economy-class-seats" tabindex="1" class="form-control" placeholder="Economy class seats number" value="" min="0" max="800">
+                  	</div>
+                  </div>
+                  <div class="col-lg-6">
+                  	<div class="form-group">
+                  		<input type="datetime-local" name="flight-departure" id="flight-departure" tabindex="1" class="form-control" value="">
+                  	</div>
+                  </div>
+                  <div class="form-group">
+                    <label>Type of flight:</label>
+                  </div>
+                  <div class="col-lg-4">
+                    <div class="form-group">
+                      <div class="radio">
+                        <label><input type="radio" data-name="CHARTER" name="flight-type" id="type-charter">Charter</label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-4">
+                    <div class="form-group">
+                      <div class="radio">
+                        <label><input type="radio" data-name="REGIONAL" name="flight-type" id="type-regional">Regional</label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-4">
+                    <div class="form-group">
+                      <div class="radio">
+                        <label><input type="radio" data-name="OVERSEAS" name="flight-type" id="type-overseas">Overseas</label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-sm-6 col-sm-offset-3">
+                        <input type="button" name="edit-btn" id="edit-btn" tabindex="4" class="form-control btn btn-register" value="Update Flight">
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+
+  $(function() {
+	  restrict();
+  })
+
+
+  $(function() {
+    $.ajax({
+     type: "GET", 
+     url: "rest/destination/all",
+     dataType: "json",
+     success: function(destinations) {
+       $("#from-destination").empty();
+       $("#from-destination").attr('disabled',false);
+       $("#to-destination").empty();
+       $("#to-destination").attr('disabled', false);
+
+       if (destinations.length == 0) {
+         $("#from-destination").attr('disabled',true);
+         $("#to-destination").attr('disabled', true);
+         alert("No destinations found!");
+       }
+       
+       $.each(destinations, function(i, destination) {
+
+         var txt = "[" + destination.airportCode + "]" + destination.name + ", " + destination.country;
+         $("#from-destination").append($("<option>", {
+           value: destination.id,
+           text: txt
+         }));
+         $("#to-destination").append($("<option>", {
+           value: destination.id,
+           text: txt
+         }));
+       });
+     },
+     error: function() {
+       alert("somethings off! (get all destinations)");
+       $("#from-destination").attr('disabled',true);
+       $("#to-destination").attr('disabled', true);
+     },
+     async: false
+    });
+});
+
+
+
+  $(function() {
+  $.ajax({
+	 type: "GET", 
+	 url: "rest/flight/all",
+	 dataType: "json",
+	 success: function(flights) {
+		 $("#flight").empty();
+		 $("#flight").attr('disabled',false);
+		 if (flights.length == 0) {
+			 $("#flight").attr('disabled',true);
+			 alert("No flights found!");
+		 }
+		 var counter = 0;
+		 $.each(flights, function(i, flight) {
+		 	var dat = flight.departureDate;
+		 	var dateString = dat.substring(0, dat.length-9);
+		 	console.log(dateString);
+			 if (counter == 0) {
+				 $("#from-destination").val(flight.fromDestination.id);
+				 $("#to-destination").val(flight.toDestination.id);
+				 $("#price").val(flight.price);
+				 $("#airplane-model").val(flight.airplaneModel);
+				 $("#first-class-seats").val(flight.firstClassSeatsNo);
+				 $("#business-class-seats").val(flight.businessClassSeatsNo);
+				 $("#economy-class-seats").val(flight.economyClassSeatsNo);
+				 $("#flight-departure").val(dateString);
+				 if (flight.flightType == "CHARTER") {
+				 	$("#type-charter").prop('checked', true);
+				 } else if (flight.flighType == "REGIONAL") {
+				 	$("#type-regional").prop('checked', true);
+				 } else {
+				 	$("#type-overseas").prop('checked', true);
+				 }
+				 
+			 }
+			 counter++;
+			 var txt = flight.flightCode + " [" + flight.fromDestination.name + " -->" + flight.toDestination.name + "]";
+			 $("#flight").append($("<option>", {
+				 value: flight.id,
+				 text: txt
+			 }));
+		 });
+	 },
+	 error: function() {
+		 alert("somethings off! (get all flights)");
+		 $("#flight").attr('disabled',true);
+	 },
+	 async: false
+  });
+});
+
+
+	$("#flight").change(function() {
+	  var flightID = $("#flight").val();
+	  $.ajax({
+		  type: "GET",
+		  url: "rest/flight/" + flightID,
+		  dataType: "json",
+		  success: function(flight) {
+		  	var dat = flight.departureDate;
+		 	var dateString = dat.substring(0, dat.length-9);
+			 $("#from-destination").val(flight.fromDestination.id);
+			 $("#to-destination").val(flight.toDestination.id);
+			 $("#price").val(flight.price);
+			 $("#airplane-model").val(flight.airplaneModel);
+			 $("#first-class-seats").val(flight.firstClassSeatsNo);
+			 $("#business-class-seats").val(flight.businessClassSeatsNo);
+			 $("#economy-class-seats").val(flight.economyClassSeatsNo);
+			 $("#flight-departure").val(dateString);
+			 if (flight.flightType == "CHARTER") {
+			 	$("#type-charter").prop('checked', true);
+			 } else if (flight.flightType == "REGIONAL") {
+			 	$("#type-regional").prop('checked', true);
+			 } else {
+			 	$("#type-overseas").prop('checked', true);
+			 }
+			    
+		  },
+		  error: function(response) {
+			  alert("Something went wrong while getting flight by id....");
+		  }
+	  })
+  })
+
+
+	$("#edit-btn").click(function() {
+		var edited = {};
+		var editedID = $("#flight").val();
+
+	    var fromDestinationId = $("#from-destination").val();
+	    var toDestinationId = $("#to-destination").val();
+	    var airplaneModel = $("#airplane-model").val();
+	    var departureDateString = $("#flight-departure").val();
+	    var flightType = $("input[name='flight-type']:checked").data('name');
+
+	    var priceString = $("#price").val();
+	    var firstClassNoString = $("#first-class-seats").val();
+	    var businessClassNoString = $("#business-class-seats").val();
+	    var economyClassNoString = $("#economy-class-seats").val();
+
+	    var price = Number(priceString);
+	    var firstClassSeatsNo = Number(firstClassNoString);
+	    var businessClassSeatsNo = Number(businessClassNoString);
+	    var economyClassSeatsNo = Number(economyClassNoString);
+	    console.log(JSON.stringify($("#flight-departure").val()));
+
+	    // sve provere kao u add
+	    if (!isNaN(firstClassSeatsNo) && firstClassSeatsNo.toString().indexOf('.') != -1) {
+	      alert("First class number has to be integer!");
+	      $("#first-class-seats").val("");
+	      return;
+	    } else if (!isNaN(businessClassSeatsNo) && businessClassSeatsNo.toString().indexOf('.') != -1) {
+	      alert("Business class seats number has to be integer!");
+	      $("#business-class-seats").val("");
+	      return;
+	    } else if (!isNaN(economyClassSeatsNo) && economyClassSeatsNo.toString().indexOf('.') != -1) {
+	      alert("Economy class seats number has to be integer!");
+	      $("#economy-class-seats").val("");
+	      return;
+	    } 
+
+	    if (price < 0 || firstClassSeatsNo < 0 || businessClassSeatsNo < 0 || economyClassSeatsNo < 0) {
+	      alert("Please fill in the form correctly! Numbers has to be positive!");
+	      return;
+	    }
+
+	    if (airplaneModel == "" || departureDateString == "" || fromDestinationId == "" || fromDestinationId == null || toDestinationId == "" || toDestinationId == null || departureDateString == null) {
+	      alert("Please fill in the form correctly! You have to fill the entire form!");
+	      return;
+	    }
+
+	    if (fromDestinationId == toDestinationId) {
+	      alert("Please choose different destinations in FROM and TO input fields!");
+	      return;
+	    }
+
+	    edited.toDestinationId = toDestinationId;
+	    edited.fromDestinationId = fromDestinationId;
+	    edited.price = price;
+	    edited.airplaneModel = airplaneModel;
+	    edited.firstClassSeatsNo = firstClassSeatsNo;
+	    edited.businessClassSeatsNo = businessClassSeatsNo;
+	    edited.economyClassSeatsNo = economyClassSeatsNo;
+	    edited.departureDateString = departureDateString;
+	    edited.flightType = flightType;
+
+
+	  $.ajax({
+		  type: "POST",
+		  url: "rest/flight/" + editedID + "/edit",
+		  contentType: "application/json",
+		  dataType: "json",
+		  data: JSON.stringify(edited),
+		  success: function(edited) {
+			  alert("Flight updated!");
+			  window.location.replace("index.html");
+		  },
+		  error: function(response) {
+			  alert("Something went wrong during flight update...");
+			  window.location.reload();
+		  }
+	  })
+
+
+	})
+
+
+</script>
+
+</body>
+</html>

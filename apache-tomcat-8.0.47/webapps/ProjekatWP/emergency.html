@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Emergency</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="js/printNavBar.js"></script>
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/emergencyStyle.css">
+
+</head>
+
+<body>
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="index.html">Home</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav" id="myNavbarList">
+      
+      </ul>
+      <ul class="nav navbar-nav navbar-right" id="log-bar">
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+  
+<div class="container">
+  	<div class="page-header">
+  		<h1 id="em-name"></h1>
+  	</div>
+  	<div class="row">
+  		<div class="col-lg-4">Information:
+  			<div class="well">
+  				<p id="em-municipality">Municipality: </p>
+  				<hr>
+  				<p id="em-description">Description: </p>
+  				<hr>
+  				<p id="em-address">Address: </p>
+  				<hr>
+  				<p id="em-date">Reported On: </p>
+  				<hr>
+  				<p id="em-teritory-name">Territory: </p>
+  				<hr>
+  				<p> Level: <span id="em-level" class="glyphicon glyphicon-signal" style="color:green;"></span></p>
+  				<hr>
+  				<p id="em-volunteer">Volunteer: </p>
+  				<hr>
+  				<input type="button" id="assign-btn" class="btn btn-primary" value="Assign Volunteer" style="display: none;"/>
+  							
+  			</div>
+  		</div>
+  		<div class="col-lg-4">
+  			<div class="well">
+  				<img id="em-img" width="400" height="400" src="" alt=""/>
+  			</div>
+  		</div>
+  		<div class="col-lg-4">
+  			<div class="well">
+  				<div id="gmap" style="width:100%;height:400px;"></div>
+  			</div>
+  		</div>
+  	</div>
+	
+	<hr>
+	<hr>
+
+	<div class="row">
+		<h2>Comments<div class="pull-right"><a id="addacomment" class="btn btn-primary">Add a coment</a> </div></h2>
+	</div>
+	<div class="row" id="addcomment" style="display: none;">
+	    <form>
+	        <textarea id="text-area" class="form-control" placeholder="Comment..."></textarea><br/>
+	        <button id="post-btn" class="btn btn-primary">Post Comment</button>
+	    </form>
+	</div>
+	<hr>
+	<div id="comment-list">
+		
+	</div>
+	
+	<hr>
+   
+</div>
+
+ 
+ 
+<script>
+
+$(document).on('click', '#addacomment', function(){
+    $('#addcomment').toggle();
+});
+
+$(function() {
+	printNav("emergency.html");
+	
+})
+
+var municipalityLabel = "Municipality: ";
+var descriptionLabel = "Description: ";
+var addressLabel = "Address: ";
+var dateLabel = "Reported On: ";
+var teritoryLabel = "Territory: ";
+var volunteerLabel = "Volunteer: ";
+var options = {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false};
+
+
+var eID = -1;
+var tID = -1;
+var isAdmin = -1;
+
+$(function() {
+	var urlParams = getUrlVars();
+	var emergencyID = urlParams.emergencyID;
+	eID = emergencyID;
+	$.ajax({
+		type: "GET",
+		url: "rest/emergency/" + emergencyID,
+		dataType: "json",
+		success: function(emergency) {
+			tID = emergency.teritory.id;
+			var dateFormat = "";
+			var date = new Date(emergency.dateTime.split("[")[0]);
+			dateFormat = date.toLocaleDateString("en-GB", options);
+			var color = emergency.level;
+			var imgVar = "emergencyImages/" + emergency.img;
+			
+			$("#em-name").text(emergency.name);
+			$("#em-municipality").text(municipalityLabel + emergency.municipality);
+			$("#em-description").text(descriptionLabel + emergency.description);
+			$("#em-address").text(addressLabel + emergency.address);
+			$("#em-date").text(dateLabel + dateFormat);
+			$("#em-teritory-name").text(teritoryLabel + emergency.teritory.name);
+			$("#em-level").css('color', color);
+			if (emergency.volunteer == null) {
+        		$("#em-volunteer").text(volunteerLabel + "/");
+			} else {
+				var fullname = emergency.volunteer.firstName + " " + emergency.volunteer.lastName;
+				$("#em-volunteer").text(volunteerLabel + fullname);
+			}
+			$("#em-img").attr('src', imgVar);
+        	
+		},
+		error: function(response) {
+			alert("Emergency not found!");
+		}
+	})
+})
+
+$(function() {
+	var params = getUrlVars();
+	var id = params.emergencyID;
+	$.ajax({
+		type: "GET",
+		url: "rest/comments/getByEmergency/" + id,
+		dataType: "json",
+		success: function(comments) {
+			var commentPanel = "";
+			$.each(comments, function(i, comment) {
+				var commentDiv = "";
+				var dateFormat = "";
+				var date = new Date(comment.dateTime.split("[")[0]);
+				dateFormat = date.toLocaleDateString("en-GB", options);
+				
+				commentDiv += '<div class="row comment">';
+				commentDiv += '<div class="head">';
+				commentDiv += '<small><strong class="user">' + comment.user.username + '</strong>' + dateFormat + '</small>';
+				commentDiv += '</div>';
+				commentDiv += '<p>' + comment.text + '</p>';
+				commentDiv += '</div>';
+				//commentDiv += '<br>'; mozda jos ovo ali nzm dal ce lepo da izgleda
+				commentPanel += commentDiv;
+			});	
+			$("#comment-list").append(commentPanel);
+		},
+		error: function(response) {
+			alert("Greska prilikom dobavljanja komentara!");
+		}
+	})
+})
+
+$(function() {
+	$.ajax({
+		type: "GET",
+		url: "rest/users/getLoggedUser",
+		dataType: "json",
+		success: function(logged) {
+			if (logged.userType == "ADMIN") {
+				isAdmin = 1;
+				$("#assign-btn").show();
+			} else {
+				isAdmin = -1;
+				$("#assign-btn").hide();
+			}
+		},
+		error: function(response) {
+			$("#addacomment").hide();
+		}
+	})
+})
+
+$("#post-btn").click(function() {
+	var commentText = $("#text-area").val();
+	if (commentText == "") {
+		alert("Morate prvo napisati komentar!");
+		return;
+	}
+	var params = getUrlVars();
+	var emID = params.emergencyID;
+	
+	var c = {};
+	
+	c.text = commentText;
+	
+	$.ajax({
+		type: "POST",
+		url: "rest/comments/postComment/" + emID,
+		dataType: "json",
+		contentType: "application/json",
+		data: JSON.stringify(c),
+		success: function(posted) {
+			alert("Komentar uspesno dodat!");
+			window.location.reload();
+		},
+		error: function(response) {
+			alert("Greska prilikom dodavanja komentar!");
+		}
+	})
+	
+	
+})
+
+$("#assign-btn").click(function() {
+	if (isAdmin == 1) {
+		assignPage(eID, tID);
+	} else {
+		alert("NEMATE OVLASCENJE ZA OVO!");
+		location.replace("index.html");
+	}
+})
+
+
+
+function getUrlVars()
+{
+    var vars = [], hash;
+    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+    for(var i = 0; i < hashes.length; i++)
+    {
+        hash = hashes[i].split('=');
+        vars.push(hash[0]);
+        vars[hash[0]] = hash[1];
+    }
+    return vars;
+}
+
+function assignPage(emergencyID, teritoryID) {
+	var pg = "assignVolunteer.html?emergencyID=" + emergencyID + "&teritoryID=" + teritoryID;
+	window.location.replace(pg);
+}
+
+
+
+
+</script>
+
+
+
+
+
+
+<script>
+function myMap() {
+	var city = $("#em-municipality").text();
+	var street = $("#em-address").text();
+	var address = street + ", " + city;
+	var geocoder = new google.maps.Geocoder();
+	
+	geocoder.geocode( {'address': address}, function(results, status) {
+		if (status == google.maps.GeocoderStatus.OK) {
+			var latitude = results[0].geometry.location.lat();
+			var longitude = results[0].geometry.location.lng();
+		}
+		var myLatLng = {lat: latitude, lng: longitude};
+		
+		var mapProp= {
+			    center:myLatLng,
+			    zoom:5,
+			};
+		
+		var map=new google.maps.Map(document.getElementById("gmap"),mapProp);
+		var marker = new google.maps.Marker({
+			position: myLatLng,
+			map: map
+		});
+	});
+	
+	
+}
+</script>
+
+
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBL3L7wTmMEOX5hRC52khFyxb235RXWUKo&callback=myMap"></script>
+
+</body>
+</html>

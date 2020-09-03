@@ -1,0 +1,4 @@
+1|Bagljas|Zrenjanin|Desila se vremenska nepogoda|28.8.2018. 21:00|Bogdana Teodosina 11|1|0|Bagljas.jpg|0|3
+2|Okolina Zrenjanina|Zrenjanin|Izgorela kuca|30.8.2018. 22:00|Puskinova 5|1|2|Bagljas.jpg|0|3
+3|Blizina Rume|Ruma|Izbila poplava|1.9.2017. 14:00|Nikole Pasica 2|2|2|Bagljas.jpg|0|4
+4|Centar Zrenjanin|Zrenjanin|Pozar|2.9.2017. 15:00|Svetosavska 15|1|1|Bagljas.jpg|0|null

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Authentication</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/authentication.css">
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+      <a class="navbar-brand" href="index.html">Home</a>
+    </div>
+    
+  </div>
+</nav>
+  
+<div class="container-fluid text-center">    
+  <div class="row content">
+    <div class="col-sm-8 text-left"> 
+      <div class="container">
+      <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        <div class="panel panel-login">
+          <div class="panel-heading">
+            <div class="row">
+              <div class="col-xs-6">
+                <a href="#" class="active" id="login-form-link">Login</a>
+              </div>
+              <div class="col-xs-6">
+                <a href="#" id="register-form-link">Register</a>
+              </div>
+            </div>
+            <hr>
+          </div>
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-lg-12">
+                <form id="login-form" role="form" style="display: block;">
+                  <div class="form-group">
+                    <input type="text" name="username-login" id="username-login" tabindex="1" class="form-control" placeholder="Username" value="">
+                  </div>
+                  <div class="form-group">
+                    <input type="password" name="password-login" id="password-login" tabindex="2" class="form-control" placeholder="Password">
+                  </div>
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-sm-6 col-sm-offset-3">
+                        <input type="button" name="login-submit" id="login-submit" tabindex="4" class="form-control btn btn-login" value="Log In">
+                      </div>
+                    </div>
+                  </div>
+                </form>
+                <form id="register-form" role="form" style="display: none;">
+                  <div class="form-group">
+                    <input type="text" name="username-signup" id="username-signup" tabindex="1" class="form-control" placeholder="Username" value="">
+                  </div>
+                  <div class="form-group">
+                    <input type="password" name="password-signup" id="password-signup" tabindex="1" class="form-control" placeholder="Password">
+                  </div>
+                  <div class="form-group">
+                    <input type="text" name="first-name" id="first-name" tabindex="1" class="form-control" placeholder="First Name" value="">
+                  </div>
+                  <div class="form-group">
+                    <input type="text" name="last-name" id="last-name" tabindex="1" class="form-control" placeholder="Last Name" value="">
+                  </div>
+                  <div class="form-group">
+                    <input type="email" name="email" id="email" tabindex="1" class="form-control" placeholder="Email Address" value="">
+                  </div>
+                  <div class="form-group">
+                    <input type="text" name="phone" id="phone" tabindex="1" class="form-control" placeholder="Phone" value="">
+                  </div>
+                  <div class="form-group">
+                  	<label for="select-teritory">Select teritory:</label>
+                  	<select class="form-control" id="teritory">
+                  	</select>
+                  </div>
+                  <div class="form-group">
+                  	<input type="file" onchange="previewFile()" id="pictureFile" name="pictureFile"><br>
+					<img src="" height="100" width="100" alt="Image preview..." id="image-thumb">
+                  </div>
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-sm-6 col-sm-offset-3">
+                        <input type="button" name="register-submit" id="register-submit" tabindex="4" class="form-control btn btn-register" value="Register Now">
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+  $(function() {
+
+    $('#login-form-link').click(function(e) {
+    $("#login-form").delay(100).fadeIn(100);
+    $("#register-form").fadeOut(100);
+    $('#register-form-link').removeClass('active');
+    $(this).addClass('active');
+    e.preventDefault();
+  });
+  $('#register-form-link').click(function(e) {
+    $("#register-form").delay(100).fadeIn(100);
+    $("#login-form").fadeOut(100);
+    $('#login-form-link').removeClass('active');
+    $(this).addClass('active');
+    e.preventDefault();
+  });
+});
+  
+  
+  $(function() {
+	  $.ajax({
+		 type: "GET", 
+		 url: "rest/teritory/all",
+		 dataType: "json",
+		 success: function(teritories) {
+			 $.each(teritories, function(i, teritory) {
+				 $("#teritory").append($("<option>", {
+					 value: teritory.id,
+					 text: teritory.name
+				 }));
+			 });
+		 },
+		 error: function() {
+			 alert("nije uspeo get teritorija");
+		 }
+	  });
+  });
+  
+  $("#login-submit").click(function() {
+	  var credentials = {};
+	  credentials.username = $("#username-login").val();
+	  credentials.password = $("#password-login").val();
+	  
+	  $.ajax({
+		  type: "POST",
+		  url: "rest/users/authenticate",
+		  data: JSON.stringify(credentials),
+		  dataType: "json",
+		  success: function(loggedUser) {
+			  alert("Ulogovan korisnik: " + loggedUser.username);
+			  if (loggedUser.userType == "ADMIN") {
+				  //window.location.replace("adminProfile.html");
+				  window.location.replace("index.html");
+			  } else {
+				  //window.location.replace("volunteerProfile.html");
+				  window.location.replace("index.html");
+			  }
+		  },
+		  error: function(response) {
+			  if (response.status == '403') {
+				  alert("Blokirani ste!");
+			  } else {
+				  alert("Uneli ste pogresno korisnicko ime ili lozinku. Pokusajte ponovo.");
+			  }  
+		  },
+		  contentType: "application/json"
+	  })
+  });
+  
+  $("#register-submit").click(function() {
+	  var user = {};
+	  var teritory = {};
+	  var username = $("#username-signup").val();
+	  var password = $("#password-signup").val();
+	  var firstName = $("#first-name").val();
+	  var lastName = $("#last-name").val();
+	  var email = $("#email").val();
+	  var phone = $("#phone").val();
+	  if (username == "" || password == "" || firstName == "" || lastName == "" || email == "" || phone == "") {
+		  alert("Molim Vas popunite sva polja!");
+		  return;
+	  }
+	  teritory.id = $("#teritory").val();
+	  var imgName = username;
+	  
+	  if ($("#image-thumb").attr('src') == "") {
+		  alert("Molim Vas izaberite sliku!");
+		  return;
+	  }
+	  uploadPhoto(imgName);
+	  
+	  user.username = username;
+	  user.password = password;
+	  user.firstName = firstName;
+	  user.lastName = lastName;
+	  user.email = email;
+	  user.phone = phone;
+	  user.img = imgName + ".jpg";
+	  user.teritory = teritory;
+	  
+	  $.ajax({
+		  type: "POST",
+		  url: "rest/users/register",
+		  dataType: "json",
+		  data: JSON.stringify(user),
+		  contentType: "application/json",
+		  success: function(registretedUser) {
+			  //console.log(JSON.stringify(registretedUser));
+			  alert("Uspesno ste se registrovali! Prijavite se!");
+			  window.location.reload();
+		  },
+		  error: function(err) {
+			  if (err.status == '403') {
+				  alert("Korisnik sa ovim korisnickim imenom vec postoji!");
+				  window.location.reload();
+			  } else if (err.status == '409') {
+				  alert("Sva polja iz forme za registraciju moraju biti popunjena!");
+			  } else if (err.status == '404') {
+				  alert("Teritorija ne postoji u bazi");
+			  }
+		  }
+	  })
+  });
+  
+  
+  function uploadPhoto(pictureName) {
+	  var fileForm = new FormData();
+	  fileForm.append('pictureFile', $("#pictureFile").get(0).files[0]);
+	  
+	  $.ajax({
+		 type: "POST",
+		 url: "rest/users/uploadImage/" + pictureName + "/1",
+		 processData: false,
+		 contentType: false,
+		 data: fileForm,
+		 success: function(data) {
+			 console.log("Slika uspesno dodata!");
+		 },
+		 error: function(response) {
+			 console.log("Greska prilikom dodavanja slike!");
+		 },
+		 async: false
+	  });
+  }
+  
+  function previewFile(){
+      var preview = document.querySelector('img'); //selects the query named img
+      var file    = document.querySelector('input[type=file]').files[0]; //sames as here
+      var reader  = new FileReader();
+
+      reader.onloadend = function () {
+          preview.src = reader.result;
+          
+      }
+
+      if (file) {
+          reader.readAsDataURL(file); //reads the data as a URL
+      } else {
+          preview.src = "";
+      }
+ }
+
+ previewFile();  //calls the function named previewFile()
+  
+</script>
+
+</body>
+</html>

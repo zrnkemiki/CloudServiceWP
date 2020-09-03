@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>My Emergencies!</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="js/printNavBar.js"></script>
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/emergencyStyle.css">
+ 
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+      <a class="navbar-brand" href="index.html">Home</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav" id="myNavbarList">
+   
+      </ul>
+      <ul class="nav navbar-nav navbar-right" id="log-bar">
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  	<div class="well well-sm">
+        <strong>My Emergencies</strong>
+        
+	</div>
+	
+	<div id="emergency-list" class="row list-group">
+	
+	
+	</div>  
+</div>
+
+<script>
+var volunteerID = -1;
+$(function() {
+	printNav("myEmergencies.html");
+})
+
+
+
+$(function() {
+	$.ajax({
+		type: "GET",
+		url: "rest/users/getLoggedUser",
+		dataType: "json",
+		success: function(logged) {
+			volunteerID = logged.id;
+		},
+		error: function(response) {
+			
+		},
+		async: false
+	})
+});	
+
+
+
+$(function() {
+	if (volunteerID == -1) {
+		alert("Something's off!!!!!!");
+	}
+	$("#emergency-list").empty();
+	$.ajax({
+		type: "GET",
+		url: "rest/emergency/getByVolunteer/" + volunteerID,
+		dataType: "json",
+		success: function(emergencies, textStatus, xhr) {
+			if (xhr.status == '204') {
+				$("#emergency-list").append("<h2>Niste zaduzeni ni za jednu vanrednu situaciju!</h2>");
+			}
+	        var panels = "";
+	        $.each(emergencies, function(i, emergency) {
+	        	var panel = "";
+	        	panel += '<div class="item  col-xs-4 col-lg-4">';
+	        	panel += '<div class="thumbnail">';
+	        	panel += '<img class="group list-group-image" src="emergencyImages/' + emergency.img + '" alt="" />';
+	        	panel += '<div class="caption">';
+	        	panel += '<h4 class="group inner list-group-item-heading">';
+	        	panel += emergency.name;
+	        	panel += '</h4>';
+	        	panel += '<p class="group inner list-group-item-text">';
+	        	panel += emergency.description;
+	        	panel += '</p>';
+	        	panel += '<div class="row">';
+	        	panel += '<div class="col-xs-12 col-md-6">';
+	        	panel += '<p class="lead">Nivo:<span class="glyphicon glyphicon-signal" style="color:' + emergency.level + ';"></span></p></div>';
+	        	panel += '<div class="col-xs-12 col-md-6">';
+	        	panel += '<input type="button" class="btn btn-success" onclick="emergencyPage(' + emergency.id + ')" value="More info" id="btn-' + emergency.id  + '">';
+	        	panel += '</div></div></div></div></div>';
+	        	panels += panel;
+	        });
+	        $("#emergency-list").append(panels);
+
+		},
+		error: function(response) {
+			alert("Greska prilikom dobavljanja emergencies");
+		}
+	})
+})
+
+function emergencyPage(emergencyID) {
+	var emPage = "emergency.html?emergencyID=" + emergencyID;
+	window.location.replace(emPage);
+}
+
+
+
+</script>
+
+
+</body>
+</html>
+

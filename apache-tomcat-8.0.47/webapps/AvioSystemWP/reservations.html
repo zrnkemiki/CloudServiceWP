@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>My Reservations</title>
+	<meta charset="ISO-8859-1">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="js/printNavBar.js"></script>
+	<script src="js/flights.js"></script>
+
+	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="css/authentication.css">
+	<link rel="stylesheet" href="css/flights.css">
+
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="index.html">Home</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li><a href="user-profile.html">Profile</a></li>
+        <li class="active"><a href="reservations.html">My Reservations</a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a onclick="logout()" id="logout-btn"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid">
+	<h1 class="text-center">RESERVATIONS</h1>
+	<div id="reservation-list" class="row list-group">
+
+	</div>
+</div>
+
+
+<script>
+	$(function() {
+		$("#reservation-list").empty();
+
+		$.ajax({
+			type: "GET",
+			url: "rest/myReservations",
+			dataType: "json",
+			success: function(reservations) {
+				var panels = "";
+				$.each(reservations, function(i, reservation) {
+					var dat = reservation.flight.departureDate;
+					var fo = dat.substring(0, dat.length - 9);
+					var splited = fo.split("T");
+					var dateFormated = splited[0] + ' ' + splited[1];
+					var panel = "";
+					panel += '<div class="col-lg-4 col-md-6 col-sm-6">';
+					panel += '<div class="ticket-card">';
+					panel += '<div class="body">';
+					panel += '<div class="artist">';
+					panel += '<h7 class="info">Reservation code</h7>';
+					panel += '<h4 class="name" id="reservation-code">' + reservation.reservationCode + '</h4>';
+					panel += '<h7 class="info">from</h7>';
+					panel += '<h4 class="name" id="from-dest">' + reservation.flight.fromDestination.name + ', ' + reservation.flight.fromDestination.country + '</h4>';
+					panel += '<h7 class="info">airport</h7>';
+					panel += '<h4 class="name" id="from-airport">' + reservation.flight.fromDestination.airportName + ' [' + reservation.flight.fromDestination.airportCode + ']' + '</h4>';
+					panel += '<h7 class="info"> to</h7>';
+					panel += '<h4 class="name" id="to-dest">' + reservation.flight.toDestination.name + ', ' + reservation.flight.toDestination.country + '</h4>';
+					panel += '<h7 class="info">airport</h7>';
+					panel += '<h4 class="name" id="to-airport">' + reservation.flight.toDestination.airportName + ' [' + reservation.flight.toDestination.airportCode + ']' + '</h4>';
+					panel += '<h7 class="info">Class</h7>';
+					panel += '<h4 class="name" id="flight-class">' + reservation.flightClass + '</h4>';
+					panel += '<h7 class="info">Number of passengers</h7>';
+					panel += '<h4 class="name" id="passenger-number">' + reservation.numberOfPassengers + '</h4>';
+					panel += '<h7 class="info">Type of flight</h7>';
+					panel += '<h4 class="name" id="flight-type">' + reservation.flight.flightType + '</h4>';
+					panel += '<h7 class="info">Departure date</h7>';
+					panel += '<h4 class="name" id="departure-date">' + dateFormated + '</h4>';
+					panel += '</div>';
+					panel += '<div class="clearfix"></div>';
+					
+					panel += '<div class="clearfix"></div>';
+					panel += '</div>';
+					panel += '<div class="footer">';
+					panel += '<button class="btn btn-info" id="cancel-btn-' + reservation.id + '" onclick="cancelReservation(' + reservation.id + ')">Cancel reservation</button>';
+					panel += '</div>';
+					panel += '</div>';
+					panel += '</div>';
+					panels += panel;
+				});
+				$("#reservation-list").append(panels);
+			},
+			error: function(response) {
+				alert("Something went wrong while getting reservations!");
+			}
+		})
+
+	})
+
+
+	function cancelReservation(id) {
+		if (id < 1) {
+			alert("Sorry! Something went wrong... Invalid reservation id!");
+			return;
+		}
+
+		$.ajax({
+			type: "POST",
+			url: "rest/reservation/" + id + "/cancel",
+			success: function() {
+				alert("You have canceled your reservation!");
+				window.location.reload();
+			},
+			error: function(response, xhr) {
+				if (xhr.status == 404) {
+					alert("Oops, something went wrong! Reservation cannot be found..");
+				} else if (xhr.status == 403) {
+					alert("You are not authorized, please log in first!");
+					window.location.replace("authentication.html");
+				}
+			} 
+		})
+
+	}
+</script>
+
+
+</body>
+</html>

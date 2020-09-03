@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Edit Territory</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="js/printNavBar.js"></script>
+  
+  <link rel="stylesheet" href="css/authentication.css">
+  <link rel="stylesheet" href="css/style.css">
+
+ 
+
+  
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="index.html">Home</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+      	<li><a href="report.html">Report</a></li>
+        <li><a href="adminProfile.html">Profile</a></li>
+        <li><a href="activateVolunteer.html">Activate Volunteer</a></li>
+        <li><a href="blockVolunteer.html">Block Volunteer</a></li>
+        <li><a href="archiveEmergency.html">Archive Emergency</a></li>
+        <li><a href="addTerritory.html">Add Territory</a></li>
+        <li><a href="deleteTerritory.html">Delete Territory</a></li>
+        <li class="active"><a href="editTerritory.html">Edit Territory</a></li>
+
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a onclick="logout()" id="logout-btn"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+  
+<div class="container-fluid text-center">    
+  <div class="row content">
+    <div class="col-sm-8 text-left"> 
+      <div class="container">
+      <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        <div class="panel panel-login">
+          <div class="panel-heading">
+            <h3>Edit Territory</h3>
+          </div>
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-lg-12">
+                <form id="report-emergency" role="form" style="display: block;">
+                  <div class="form-group">
+                  	<label for="select-teritory">Select territory:</label>
+                  	  <select class="form-control" id="teritory">
+                  	  
+                  	  </select>
+                  </div>
+                  <div class="form-group"><label>Name (place; location)</label>
+                    <input type="text" name="name" id="name" tabindex="1" class="form-control" style="display: none;" placeholder="Name (place; location)" value="">
+                  </div>
+                  <div class="form-group"><label>Area (km2) [max=10000000]</label>
+                    <input type="number" min="1" max="10000000" name="area" id="area" tabindex="1" style="display: none;" class="form-control" placeholder="Area (km2) max=10000000" value="">
+                  </div>
+                  <div class="form-group"><label>Population [max=50000000]</label>
+                    <input type="number" step="1" min="1" max="50000000" name="population" style="display: none;" id="population" tabindex="1" class="form-control" placeholder="Population max=50000000" value="">
+                  </div>
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-sm-6 col-sm-offset-3">
+                        <input type="button" name="edit-btn" id="edit-btn" tabindex="4" class="form-control btn btn-register" value="Confirm!">
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+  var loggedUserType = "";
+  
+  $(function() {
+	  restrict();
+  })
+  
+  $(function() {
+	  $.ajax({
+		 type: "GET", 
+		 url: "rest/teritory/all",
+		 dataType: "json",
+		 success: function(teritories) {
+			 $("#teritory").empty();
+			 $("#teritory").attr('disabled',false);
+			 if (teritories.length == 0) {
+				 $("#teritory").attr('disabled',true);
+			 } else {
+				 $("#population").show();
+				 $("#name").show();
+				 $("#area").show();
+			 }
+			 var counter = 0;
+			 $.each(teritories, function(i, teritory) {
+				 if (counter == 0) {
+					 $("#name").val(teritory.name);
+					 $("#population").val(teritory.population);
+					 $("#area").val(teritory.area);
+				 }
+				 counter++;
+				 $("#teritory").append($("<option>", {
+					 value: teritory.id,
+					 text: teritory.name
+				 }));
+			 });
+		 },
+		 error: function() {
+			 alert("nije uspeo get teritorija");
+			 $("#teritory").attr('disabled',true);
+		 },
+		 async: false
+	  });
+});
+  
+  $("#teritory").change(function() {
+	  var tID = $("#teritory").val();
+	  $.ajax({
+		  type: "GET",
+		  url: "rest/teritory/" + tID,
+		  dataType: "json",
+		  success: function(t) {
+			  $("#name").val(t.name);
+			  $("#population").val(t.population);
+			  $("#area").val(t.area);
+		  },
+		  error: function(response) {
+			  alert("Nesto nije  u redu -> nije uspelo dobavljanje teritorije");
+		  }
+	  })
+  })
+  
+  $("#edit-btn").click(function() {
+	  var edited = {};
+	  var terID = $("#teritory").val();
+	  
+	  var name = $("#name").val();
+	  var populationString = $("#population").val();
+	  var area = $("#area").val();
+	  var population = Number(populationString);
+	  
+	  if (!isNaN(population) && population.toString().indexOf('.') != -1) {
+		  alert("Polje population mora biti ceo broj!");
+		  $("#population").val("");
+		  $("#population").focus();
+		  return;
+	  }
+	  
+	  if (name == "" || area == "" || populationString == "") {
+		  alert("Molim Vas popunite sva polja!");
+		  return;
+	  }
+	  if (area < 1 || area > 10000000 || population < 1 || population > 50000000) {
+	      alert("Molim Vas da postujete ogranicenja prilikom popunjavanja forme!");
+	      return;
+	  }
+	  
+	  edited.name = name;
+	  edited.population = population;
+	  edited.area = area;
+	  
+	  $.ajax({
+		  type: "POST",
+		  url: "rest/teritory/" + terID + "/edit",
+		  contentType: "application/json",
+		  dataType: "json",
+		  data: JSON.stringify(edited),
+		  success: function(edited) {
+			  alert("Uspesno izmenjeni podaci!");
+			  window.location.replace("index.html");
+		  },
+		  error: function(response) {
+			  alert("Doslo je do greske prilikom izmene!");
+			  window.location.reload();
+		  }
+	  })
+	  
+	  
+  })
+
+</script>
+
+</body>
+</html>

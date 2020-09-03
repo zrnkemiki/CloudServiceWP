@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Block Volunteer</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="js/printNavBar.js"></script>
+  
+  <link rel="stylesheet" href="css/authentication.css">
+  <link rel="stylesheet" href="css/style.css">
+  
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="index.html">Home</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+      	<li><a href="report.html">Report</a></li>
+        <li><a href="adminProfile.html">Profile</a></li>
+        <li><a href="activateVolunteer.html">Activate Volunteer</a></li>
+        <li class="active"><a href="blockVolunteer.html">Block Volunteer</a></li>
+        <li><a href="archiveEmergency.html">Archive Emergency</a></li>
+        <li><a href="addTerritory.html">Add Territory</a></li>
+        <li><a href="deleteTerritory.html">Delete Territory</a></li>
+        <li><a href="editTerritory.html">Edit Territory</a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a onclick="logout()" id="logout-btn"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+  
+<div class="container-fluid text-center">    
+  <div class="row content">
+    <div class="col-sm-8 text-left"> 
+      <div class="container">
+      <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        <div class="panel panel-login">
+          <div class="panel-heading">
+            <label>Block Volunteer</label>
+          </div>
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-lg-12">
+                <form id="report-emergency" role="form" style="display: block;">
+                  <div class="form-group" style="display:block;" id="select-volunteer">
+                    <label for="select-volunteer">Select volunteer:</label>
+                    <select class="form-control" id="volunteer">
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-sm-6 col-sm-offset-3">
+                        <input type="button" name="block-btn" id="block-btn" tabindex="4" class="form-control btn btn-register" value="Block Volunteer!">
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+    </div>
+  </div>
+</div>
+
+<script>
+	
+$(function() {
+	  restrict();
+});
+
+  $(function() {
+    $.ajax({
+      type: "GET",
+      url: "rest/users/getActiveVolunteers",
+      dataType: "json",
+      success: function(active) {
+        $("#volunteer").empty();
+        $("#volunteer").attr('disabled',false);
+        if (active.length == 0) {
+          $("#volunteer").attr('disabled',true);
+        }
+        $.each(active, function(i, volunteer) {
+          var fullname = volunteer.firstName + " " + volunteer.lastName + " [" + volunteer.username + "]";
+          $("#volunteer").append($("<option>", {
+            value: volunteer.id,
+            text: fullname
+          }));
+        });
+      },
+      error: function(response) {
+        $("#volunteer").empty();
+        $("#volunteer").attr('disabled', true);
+        //alert("Nema aktivnih volontera!");
+      }
+    })
+  })
+
+  $("#block-btn").click(function() {
+    var volunteerID = -1;
+    volunteerID = $("#volunteer").val();
+    if (volunteerID == -1 || volunteerID == null) {
+      alert("Morate izabrati volontera kojeg zelite da blokirate!");
+      return;
+    }
+
+    $.ajax({
+      type: "POST",
+      url: "rest/users/" + volunteerID + "/block",
+      success: function(response) {
+        alert("Volonter uspesno blokiran!");
+        window.location.replace("index.html");
+      },
+      error: function(response) {
+        alert("Doslo je do greske prilikom blokiranja volontera!");
+        window.location.reload();
+      }
+    })
+  })
+
+</script>
+
+</body>
+</html>
