@@ -1,6 +1,9 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import dto.OrganizationDTO;
 
 public class Organization {
 
@@ -26,6 +29,14 @@ public class Organization {
 		this.vms = vms;
 	}
 
+	public Organization(OrganizationDTO dto) {
+		this.name = dto.getName();
+		this.about = dto.getAbout();
+		this.logo = dto.getLogo();
+		this.users = new ArrayList<Integer>();
+		this.vms = new ArrayList<Integer>();
+	}
+	
 	public int getId() {
 		return id;
 	}
