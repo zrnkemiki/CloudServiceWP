@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Authentication</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="js/globalFunctions.js"></script>
+    <!--script type="text/javascript" src="js/authentication.js"></script-->
+    <link rel="stylesheet" href="css/authentication.css">
+    <link rel="stylesheet" href="css/style.css">
+
+
+</head>
+
+<body>
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="index.html">Home</a>
+            </div>
+
+        </div>
+    </nav>
+    <div class="container-fluid text-center">
+        <div class="row content">
+            <div class="col-sm-12 text-left">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-6 col-md-offset-3">
+                            <div class="panel panel-login">
+                                <div class="panel-heading">
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <a href="#" class="active" id="login-form-link">Login</a>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <form id="login-form" role="form" style="display: block;">
+                                                <div class="form-group">
+                                                    <input type="text" name="email-login" id="email-login" tabindex="1" class="form-control" placeholder="Email" value="">
+                                                </div>
+                                                <div class="form-group">
+                                                    <input type="password" name="password-login" id="password-login" tabindex="2" class="form-control" placeholder="Password">
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="row">
+                                                        <div class="col-sm-6 col-sm-offset-3">
+                                                            <input type="button" name="login-submit" id="login-submit" tabindex="4" class="form-control btn btn-login" value="Log In">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                          </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<script>
+  $("#login-submit").click(function() {
+      var credentials = {};
+      credentials.email = $("#email-login").val();
+      credentials.password = $("#password-login").val();
+      
+      $.ajax({
+          type: "POST",
+          url: "rest/authenticate",
+          data: JSON.stringify(credentials),
+          dataType: "json",
+          success: function(loggedUser) {
+              alert("Logged in user:  " + loggedUser.email);
+              window.location.replace("index.html");
+          },
+          error: function(response) {
+              if (response.status == '403') {
+                  alert("Forbidden.");
+              } else {
+                  alert("Invalid username/password");
+              }
+              window.location.reload();  
+          },
+          contentType: "application/json"
+      })
+  });  
+</script>
+
+</body>
+</html>

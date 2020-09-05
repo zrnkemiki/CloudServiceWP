@@ -22,10 +22,7 @@ public class Organizations {
 	public void setOrganizations(HashMap<Integer, Organization> organizations) {
 		this.organizations = organizations;
 	}
-	/*
-	public List<Organization> getOrganizationsAsList() {
-		return this.organizations.values().stream().collect(Collectors.toList());
-	}
-	*/
+
+	
 	
 }

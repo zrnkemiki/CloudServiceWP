@@ -1,1 +1,1 @@
-{"organizations":{"0":{"about":"organizacija","id":0,"logo":"organizacija","name":"organizacija","users":[],"vms":[]}}}
+{"organizations":{"0":{"about":"organizacija","id":0,"logo":"ftn","name":"organizacija","users":[],"vms":[]},"1":{"about":"Organizacija 1","id":1,"logo":"organizacija","name":"Organizacija 1","users":[],"vms":[]},"2":{"about":"Organizacija 2","id":2,"logo":"ftn","name":"Organizacija 2","users":[],"vms":[]},"3":{"about":"Organizacija 3","id":3,"logo":"ftn","name":"Organizacija 3","users":[],"vms":[]}}}

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Organizations</title>
+  <meta charset="ISO-8859-1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="js/globalFunctions.js"></script>
+  <script type="text/javascript" src="js/index.js"></script>
+
+  <link rel="stylesheet" href="css/authentication.css">
+  <link rel="stylesheet" href="css/style.css">
+
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="index.html">Home</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li class="active"><a >Organization view</a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a onclick="logout()" id="logout-btn"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <h2>CloudServiceWP</h2>
+  <p>All organizations</p>            
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>About</th>
+        <th>Logo</th>
+      </tr>
+    </thead>
+    <tbody id="organizations-list">
+    </tbody>
+  </table>
+</div>
+
+<script>
+
+
+ $(function() {
+    $("#organizations-list").empty();
+
+    $.ajax({
+      type: "GET",
+      url: "rest/organization/all",
+      dataType: "json",
+      success: function(organizations) {
+        var panels = "";
+        console.log("Ovo su organizacije: " + JSON.stringify(organizations));
+        $.each(organizations, function(i, organization) {
+          var panel = "";
+          console.log("Ovo je organizacija: " + JSON.stringify(organization));
+          panel += '<tr>'
+          panel += '<td>' + organization.name + '</td>';
+          panel += '<td>' + organization.about + '</td>';
+          panel += '<td>' + organization.logo + '</td>';
+          panel += '<td><button class="btn btn-danger" type="submit" onclick="deleteOrganization(&quot;' + organization.id + '&quot;)">DELETE</button>';
+          panel += '<button class="btn btn-success" type="submit" onclick="editOrganization(&quot;' + organization.id + '&quot;)">EDIT</button></td>';
+          panel += '</tr>'
+
+          panels += panel;
+        });
+        $("#organizations-list").append(panels);
+      },
+      error: function(response) {
+        alert("Something went wrong while getting organizations!");
+      }
+    })
+
+  })
+
+
+  function deleteOrganization(orgId) {
+      console.log(orgId);
+      console.log("Usao u delete");
+      alert("Uspesno obrisano!");
+  }
+
+  function editOrganization(orgId) {
+    window.location.replace("organization-edit.html?id=" + orgId);
+  }
+
+
+  </script>
+
+</body>
+</html>

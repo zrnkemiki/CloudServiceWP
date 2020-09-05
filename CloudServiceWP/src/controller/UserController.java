@@ -5,6 +5,7 @@ import java.util.Collection;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -16,6 +17,7 @@ import javax.ws.rs.core.Response;
 
 import dto.CredentialsDTO;
 import dto.UserDTO;
+import enums.UserType;
 import model.User;
 import service.UserService;
 
@@ -32,7 +34,14 @@ public class UserController {
 	@Path("/user/all")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAllUsers() {
-		Collection<User> allUsers = UserService.getUsers(ctx).getUsers().values();
+		Collection<User> allUsers = null;
+		User logged = (User) request.getSession().getAttribute("loggedUser");
+		if(logged.getUserType() == UserType.SUPERADMIN) {
+			allUsers = UserService.getUsers(ctx).getUsers().values();
+		}
+		else {
+			allUsers = UserService.getUsersForAdmin(ctx, logged).getUsers().values();
+		}
 		return Response.ok(allUsers).build();
 	}
 	
@@ -68,11 +77,33 @@ public class UserController {
 		}
 	}
 	
+	@GET
+	@Path("/user/{email}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getUserByEmail(@PathParam("email") String email) {
+		System.out.println("Usao sam u get user by mail" + email);
+		User user = UserService.getUserByEmail(email, ctx);
+		System.out.println("Vracam usera" + user.toString());
+		return Response.status(Response.Status.OK).entity(user).build();
+		
+	}
+	
+	
 	@POST
 	@Path("/user/{email}/edit")
+	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response editUser(UserDTO edited, @PathParam("email") String email) {
 		return UserService.editUserProfile(edited, email, ctx, request);
+	}
+	
+	@DELETE
+	@Path("/user/{email}/delete")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response deleteUser(@PathParam("email") String email) {
+		UserService.deleteUser(email, request, ctx);
+		return Response.status(Response.Status.OK).build();
 	}
 
 }

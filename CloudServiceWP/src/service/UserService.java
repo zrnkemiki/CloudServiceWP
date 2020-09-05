@@ -35,7 +35,7 @@ public class UserService {
 		if (logged.getUserType() == UserType.ADMIN) {
 			dto.setOrganization(logged.getOrganization());
 		}
-		//dto.setOrganization(OrganizationService.getOrganizationID(dto.getOrganizationId()));
+		// dto.setOrganization(OrganizationService.getOrganizationID(dto.getOrganizationId()));
 		User newUser = new User(dto);
 		Users allUsers = getUsers(ctx);
 		newUser.setId(allUsers.getUsers().size() + 1);
@@ -59,52 +59,51 @@ public class UserService {
 	public static Response deleteUser(String email, HttpServletRequest request, ServletContext ctx) {
 		User logged = (User) request.getSession().getAttribute("loggedUser");
 		if (logged.getEmail().equalsIgnoreCase(email)) {
-			return Response.status(Response.Status.BAD_REQUEST).build();
-		} else {
+			return Response.status(Response.Status.FORBIDDEN).build();
+		} 
+		else {
 			Users allUsers = getUsers(ctx);
 			User u = allUsers.getUsers().get(email);
 			allUsers.getUsers().remove(email);
 			saveUsers(ctx, allUsers);
 			OrganizationService.removeUserFromOrganization(u, ctx);
-			
-			
-
+			return Response.status(Response.Status.OK).build();
 		}
-		return Response.status(Response.Status.OK).build();
 	}
 
 	// korisnik menja svoj profil
-	public static Response editUserProfile(UserDTO edited, String email, ServletContext ctx, HttpServletRequest request) {
+	public static Response editUserProfile(UserDTO edited, String email, ServletContext ctx,
+			HttpServletRequest request) {
 		Users allUsers = getUsers(ctx);
-		
+
 		if (allUsers.getUsers().containsKey(edited.getEmail())) {
 			// ako postoji user sa tim email-om hendlaj u error na frontu poruku
 			return Response.status(Response.Status.CONFLICT).build();
 		}
-		
+
 		// ako neko polje nije popunjeno, vrati gresku
 		if (edited.getFirstName().equals("") || edited.getLastName().equals("") || edited.getPassword().equals("")) {
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
-		
+
 		User userForEdit = getUserByEmail(email, ctx);
-		
+
 		if (userForEdit == null) {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
-		
+
 		userForEdit.setEmail(edited.getEmail());
 		userForEdit.setFirstName(edited.getFirstName());
 		userForEdit.setLastName(edited.getLastName());
 		userForEdit.setPassword(edited.getPassword());
-		
+
 		allUsers.getUsers().remove(email);
 		allUsers.getUsers().put(userForEdit.getEmail(), userForEdit);
 		saveUsers(ctx, allUsers);
-		
+
 		request.getSession().removeAttribute("loggedUser");
 		request.getSession().setAttribute("loggedUser", userForEdit);
-		
+
 		return Response.status(Response.Status.OK).build();
 	}
 
@@ -137,7 +136,7 @@ public class UserService {
 		return users;
 
 	}
-	
+
 	public static User getUserByEmail(String email, ServletContext ctx) {
 		Users allUsers = getUsers(ctx);
 		User found = allUsers.getUsers().get(email);
@@ -149,6 +148,23 @@ public class UserService {
 	// ADMIN:
 	// prikaz svih korisnika iz svoje organizacije
 	// samo se prosledi param u zavisnosti od ulogovanog korisnika
+
+	// Pozeljno izmeniti da radi sa iteratorom!!!
+	public static Users getUsersForAdmin(ServletContext ctx, User admin) {
+		Users allUsers = (Users) ctx.getAttribute("users");
+		Users returnUsers = new Users();
+		if (allUsers == null) {
+			allUsers = loadUsers(ctx.getRealPath(""));
+			ctx.setAttribute("users", allUsers);
+		}
+		for (String key : allUsers.getUsers().keySet()) {
+			if (allUsers.getUsers().get(key).getOrganization().getId() == admin.getOrganization().getId()
+					&& allUsers.getUsers().get(key).getUserType() != UserType.SUPERADMIN) {
+				returnUsers.getUsers().put(allUsers.getUsers().get(key).getEmail(), allUsers.getUsers().get(key));
+			}
+		}
+		return returnUsers;
+	}
 
 	public static Users getUsers(ServletContext ctx) {
 		Users allUsers = (Users) ctx.getAttribute("users");
@@ -195,4 +211,5 @@ public class UserService {
 
 		return null;
 	}
+
 }

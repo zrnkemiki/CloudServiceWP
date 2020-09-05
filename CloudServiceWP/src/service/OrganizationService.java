@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collection;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
@@ -71,7 +72,7 @@ public class OrganizationService {
 
 	public static void saveOrganizations(ServletContext ctx, Organizations allOrganizations) {
 		String path = ctx.getRealPath("") + "data/organizations.txt".replace("/", System.getProperty("file.separator"));
-		
+
 		String data = "";
 		Jsonb jsonb = JsonbBuilder.create();
 		data = jsonb.toJson(allOrganizations);
@@ -90,8 +91,16 @@ public class OrganizationService {
 
 	public static Organization getOrganizationByID(int id, ServletContext ctx) {
 		Organizations organizations = getOrganizations(ctx);
-		Organization organization = organizations.getOrganizations().get(id);
-		return organization;
+		Organization newOrg = null;
+		System.out.println("Ovo je id = " + id);
+		System.out.println("Ovo su sve vrednosti= " + organizations.getOrganizations().keySet());
+		Collection<Organization> org = organizations.getOrganizations().values();
+		for (Organization organization : org) {
+			if (organization.getId() == id) {
+				newOrg = organization;
+			}
+		}
+		return newOrg;
 	}
 
 	// SUPER ADMIN:
@@ -126,9 +135,30 @@ public class OrganizationService {
 	// ADMIN:
 	// slicno i jedan i drugi
 	// moze da prima DTO ili Organization zavisi kako bude lakse
-	public static Organization editOrganization() {
+	public static Response editOrganization(OrganizationDTO edited, int id, ServletContext ctx,
+			HttpServletRequest request) {
+		Organization o = getOrganizationByID(id, ctx);
 
-		return null;
+		// ako neko polje nije popunjeno, vrati gresku
+		if (edited.getName().equals("") || edited.getAbout().equals("")) {
+			return Response.status(Response.Status.BAD_REQUEST).build();
+		}
+
+		if (o == null) {
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
+
+		o.setName(edited.getName());
+		o.setAbout(edited.getAbout());
+		if(!(edited.getLogo() == null)) {
+			o.setLogo(edited.getLogo());
+		}
+		Organizations orgs = getOrganizations(ctx);
+		orgs.getOrganizations().replace(o.getId(), o);
+		saveOrganizations(ctx, orgs);
+		
+
+		return Response.status(Response.Status.OK).build();
 	}
 
 }
