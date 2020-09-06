@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.json.bind.Jsonb;
@@ -18,8 +19,7 @@ import javax.ws.rs.core.Response;
 
 import dto.VirtualMachineDTO;
 import enums.UserType;
-import model.Organization;
-import model.Organizations;
+import model.Disk;
 import model.User;
 import model.VirtualMachine;
 import model.VirtualMachines;
@@ -88,16 +88,46 @@ public class VirtualMachineService {
 	 * SUPER ADMIN: isto kao ADMIN samo mora da odabere organizaciju ADMIN: vidi u
 	 * dokumentaciji
 	 */
-	public static VirtualMachine addVirtualMachine(VirtualMachineDTO dto) {
+	public static Response addVirtualMachine(VirtualMachineDTO dto, ServletContext ctx, HttpServletRequest request) {
+		User logged = (User) request.getSession().getAttribute("loggedUser");
+		if (logged.getUserType() == UserType.ADMIN) {
+			dto.setOrganizationId(logged.getOrganization().getId());
+		}
+		else if(logged.getUserType() == UserType.SUPERADMIN){
+			System.out.println("Korisnik je super admin.");
+		}
+		else {
+			return Response.status(Response.Status.FORBIDDEN).build();
+		}
+		
+		if(dto.getName().equals("")) {
+			return Response.status(Response.Status.BAD_REQUEST).build();
+		}
+		
+		VirtualMachine vm = new VirtualMachine();
+		VirtualMachines vms = getVirtualMachines(ctx);
+		vm.setId(vms.getVms().size() +1);
+		vm.setName(dto.getName());
+		vm.setCategory(CategoryService.getCategoryByID(dto.getCategoryId(), ctx));
+		vm.setOrganization(OrganizationService.getOrganizationByID(dto.getOrganizationId(), ctx));
+		vm.setNumberOfCores(vm.getCategory().getNumberOfCores());
+		vm.setNumberOfGpuCores(vm.getCategory().getNumberOfGpuCores());
+		vm.setRam(vm.getCategory().getRam());
+		vms.getVms().put(vm.getId(), vm);
 
-		return null;
+		saveVirtualMachines(ctx, vms);
+		return Response.status(Response.Status.CREATED).build();
+		
 
 	}
 
 	// SUPER ADMIN ili ADMIN
 	public static Response deleteVirtualMachine(int id, HttpServletRequest request, ServletContext ctx) {
 		VirtualMachines vms = getVirtualMachines(ctx);
-		vms.getVms().remove(id);
+		vms.getVms().remove(String.valueOf(id));
+		saveVirtualMachines(ctx, vms);
+		System.out.println("Virtual machines updated.");
+		DiskService.removeVMfromDisk(id, ctx);
 		return Response.status(Response.Status.OK).build();
 	}
 
@@ -171,4 +201,29 @@ public class VirtualMachineService {
 		return vm;
 	}
 
+	public static void removeDiskFromMachine(int vmId, int diskId, ServletContext ctx) {
+		VirtualMachines vms = getVirtualMachines(ctx);
+		Iterator i = vms.getVms().get(String.valueOf(vmId)).getDisks().iterator();
+		while (i.hasNext()) {
+			Disk d = (Disk) i.next();
+			if (d.getId() == diskId){
+				i.remove();
+			}
+		saveVirtualMachines(ctx, vms);
+		}
+		
+	}
+
+	public static boolean checkForCategoryConflict(int id, ServletContext ctx) {
+		boolean flag = false;
+		VirtualMachines vms = getVirtualMachines(ctx);
+		Collection<VirtualMachine> collection = vms.getVms().values();
+		for (VirtualMachine virtualMachine : collection) {
+			if(virtualMachine.getCategory().getId() == id) {
+				return flag = true;
+			}
+		}
+		return flag;
+		
+	}
 }

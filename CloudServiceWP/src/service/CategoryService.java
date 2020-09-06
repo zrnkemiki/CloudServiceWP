@@ -11,9 +11,13 @@ import java.util.Collection;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Response;
 
+import dto.CategoryDTO;
 import model.Categories;
 import model.CategoryVM;
+import model.User;
 
 public class CategoryService {
 
@@ -82,6 +86,44 @@ public class CategoryService {
 			e.printStackTrace();
 		}
 		ctx.removeAttribute("categories");
+	}
+
+	public static Response deleteCategory(int id, ServletContext ctx, HttpServletRequest request) {
+		Categories categories = getCategories(ctx);
+		if(!VirtualMachineService.checkForCategoryConflict(id, ctx)) {
+			categories.getCategories().remove(String.valueOf(id));
+			saveCategories(ctx, categories);
+			System.out.println("Categories updated.");
+			return Response.status(Response.Status.OK).build();
+		}
+		else {
+			return Response.status(Response.Status.CONFLICT).build();
+		}
+	}
+
+	public static Response addCategory(CategoryDTO dto, ServletContext ctx, HttpServletRequest request) {
+		User logged = (User) request.getSession().getAttribute("loggedUser");
+		if (logged.getUserType() == null) {
+			return Response.status(Response.Status.FORBIDDEN).build();
+		}
+		else if(dto.getName().equals("")) {
+			return Response.status(Response.Status.BAD_REQUEST).build();
+		}
+			
+		CategoryVM category = new CategoryVM();
+		Categories categories = getCategories(ctx);
+		
+		category.setId(categories.getCategories().size() + 1);
+		category.setName(dto.getName());
+		category.setNumberOfCores(dto.getNumberOfCores());
+		category.setNumberOfGpuCores(dto.getNumberOfGpuCores());
+		category.setRam(dto.getRam());
+		
+		categories.getCategories().put(category.getId(), category);
+
+		saveCategories(ctx, categories);
+		return Response.status(Response.Status.CREATED).build();
+		
 	}
 
 

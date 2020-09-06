@@ -69,8 +69,8 @@
           panel += '<td>' + user.lastName + '</td>';
           panel += '<td>' + user.email + '</td>';
           panel += '<td>' + user.organization.name + '</td>';
-          panel += '<td><button class="btn btn-danger" type="submit" onclick="deleteUser(&quot;' + user.email + '&quot;)">DELETE</button>';
-          panel += '<button class="btn btn-success" type="submit" onclick="editUser(&quot;' + user.email + '&quot;)">EDIT</button></td>';
+          panel += '<td><button class="btn btn-success" type="submit" onclick="editUser(&quot;' + user.email + '&quot;)">EDIT-VIEW</button>';
+          panel += '<button class="btn btn-danger" type="submit" onclick="deleteUser(&quot;' + user.email + '&quot;)">DELETE</button></td>';
           panel += '</tr>'
 
           panels += panel;
@@ -89,14 +89,16 @@
        $.ajax({
       type: "DELETE",
       url: "rest/user/" + userEmail + "/delete/",
-      dataType: "json",	
       success: function() {
         alert("User with email: " + userEmail + " deleted successfully!")
         window.location.reload();
       },
-      error: function(response) {
-        alert("Something went wrong while deleting user!");
-        window.location.reload()
+     error: function(xhr, status) {
+        if (xhr.status == 404) {
+          alert("User that you want to delete cannot be found!");
+        }
+        alert("Something went wrong while deleting vm!");
+        window.location.replace("vms-view.html");
       }
     })
 

@@ -23,7 +23,7 @@
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
-        <li class="active"><a >VMS view</a></li>
+        <li class="active"><a >Category view</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><a onclick="logout()" id="logout-btn"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
@@ -34,19 +34,18 @@
 
 <div class="container">
   <h2>CloudServiceWP</h2>
-  <p>All vms</p>            
+  <p>All categories</p>            
   <table class="table table-striped">
-  	<button class="btn btn-success" onclick="addVm()">Add new virtual machine</button>
+  	<button class="btn btn-success" onclick="addCategory()">Add category</button>
     <thead>
       <tr>
         <th>Name</th>
-        <th>Organization</th>
-        <th>Broj jezgara</th>
+        <th>Number of cores</th>
+        <th>Number of GPU cores</th>
         <th>Ram</th>
-        <th>GPU Jezgra</th>
       </tr>
     </thead>
-    <tbody id="vms-list">
+    <tbody id="category-list">
     </tbody>
   </table>
 </div>
@@ -72,66 +71,64 @@
 
 
 
-    $("#vms-list").empty();
+    $("#category-list").empty();
 
     $.ajax({
       type: "GET",
-      url: "rest/vms/all",
+      url: "rest/category/all",
       dataType: "json",
-      success: function(vms) {
+      success: function(categories) {
         var panels = "";
-        console.log("Ovo su organizacije: " + JSON.stringify(vms));
-        $.each(vms, function(i, vm) {
+        console.log("Ovo su kategorije: " + JSON.stringify(categories));
+        $.each(categories, function(i, category) {
           var panel = "";
-          console.log("Ovo je vm: " + JSON.stringify(vm));
+          console.log("Ovo je vm: " + JSON.stringify(category));
           panel += '<tr>'
-          panel += '<td>' + vm.name + '</td>';
-          panel += '<td>' + vm.organization.name + '</td>';
-          panel += '<td>' + vm.category.numberOfCores + '</td>';
-          panel += '<td>' + vm.category.ram + '</td>';
-          panel += '<td>' + vm.numberOfGpuCores + '</td>';
-          panel += '<td><button class="btn btn-success" type="submit" onclick="editVM(&quot;' + vm.id + '&quot;)">EDIT-VIEW</button>';
-          panel += '<button class="btn btn-danger" type="submit" onclick="deleteVM(&quot;' + vm.id + '&quot;)">DELETE</button></td>';
+          panel += '<td>' + category.name + '</td>';
+          panel += '<td>' + category.numberOfCores + '</td>';
+          panel += '<td>' + category.numberOfGpuCores + '</td>';
+          panel += '<td>' + category.ram + '</td>';
+          panel += '<td><button class="btn btn-success" type="submit" onclick="editCategory(&quot;' + category.id + '&quot;)">EDIT-VIEW</button>';
+          panel += '<button class="btn btn-danger" type="submit" onclick="deleteCategory(&quot;' + category.id + '&quot;)">DELETE</button></td>';
           panel += '</tr>'
 
           panels += panel;
         });
-        $("#vms-list").append(panels);
+        $("#category-list").append(panels);
       },
       error: function(response) {
-        alert("Something went wrong while getting virtual machines!");
+        alert("Something went wrong while getting categories!");
       }
     })
 
   })
 
 
-  function deleteVM(vmID) {
+  function deleteCategory(categoryId) {
       console.log("Usao sam u delete activity");
        $.ajax({
       type: "DELETE",
-      url: "rest/vm/" + vmID + "/delete",
+      url: "rest/category/" + categoryId + "/delete",
       success: function() {
-        alert("VM with id: " + vmID + " deleted successfully!")
-        window.location.replace("vms-view.html");
+        alert("Categorie with id: " + categoryId + " deleted successfully!")
+        window.location.replace("categories-view.html");
       },
       error: function(xhr, status) {
-        if (xhr.status == 404) {
-          alert("Machine that you want to delete cannot be found!");
+        if (xhr.status == 409) {
+          alert("Category that you want to delete is already in use!");
         }
-        alert("Something went wrong while deleting vm!");
-        window.location.replace("vms-view.html");
+        window.location.replace("categories-view.html");
       }
     })
   }
 
-  function editVM(vmID) {
-    window.location.replace("vm-edit.html?id=" + vmID);
+  function editCategory(categoryId) {
+    window.location.replace("category-edit.html?id=" + categoryId);
   }
 
 
-  function addVm() {
-	window.location.replace("add-vm.html");
+  function addCategory() {
+	window.location.replace("add-category.html");
   }
 
   </script>

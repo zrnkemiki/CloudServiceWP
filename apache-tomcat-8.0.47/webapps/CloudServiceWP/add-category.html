@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>VM Profile</title>
+	<meta charset="ISO-8859-1">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="js/globalFunctions.js"></script>
+  <script type="text/javascript" src="js/index.js"></script>
+
+  <link rel="stylesheet" href="css/authentication.css">
+  <link rel="stylesheet" href="css/style.css">
+
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="index.html">Home</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="user-edit.html">Category add</a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a onclick="logout()" id="logout-btn"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid text-center">    
+  <div class="row content">
+    <div class="col-sm-8 text-left"> 
+      <div class="container">
+      <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        <div class="panel panel-login">
+          <div class="panel-heading">
+            <h3>Category</h3>
+            <hr>
+          </div>
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-lg-12">
+                <form role="form" style="display: block;">
+                  <div class="form-group">
+                    <input type="text" name="name-edit" id="name-edit" tabindex="1" class="form-control" placeholder="Name" value="">
+                  </div>
+                  <div class="form-group">
+                        <label>Choose number of cores:</label>
+                          <select name="type" id="numberOfCores-edit">
+                            <option value="2">2</option>
+                            <option value="4">4</option>
+                            <option value="6">6</option>
+                            <option value="8">8</option>
+                            <option value="10">10</option>
+                            <option value="12">12</option>
+                          </select>
+                  </div>
+                  <div class="form-group">
+                      <label>Choose ram capacity:</label>
+                          <select name="type" id="ram-edit">
+                            <option value="2">2 GB</option>
+                            <option value="4">4 GB</option>
+                            <option value="8">8 GB</option>
+                            <option value="16">16 GB</option>
+                            <option value="32">32 GB</option>
+                            <option value="64">64 GB</option>
+                          </select>
+                  </div>
+                   <div class="form-group">
+                       <label>Choose organization:</label>
+                        <select name="type" id="numberOfGpuCores-list">
+                            <option value="2">2</option>
+                            <option value="4">4</option>
+                            <option value="6">6</option>
+                            <option value="8">8</option>
+                            <option value="10">10</option>
+                            <option value="12">12</option>
+                          </select>
+                      </form>
+                  </div>
+                  <div class="form-group">
+                    <div class="row">
+                       <div class="col-sm-6 col-sm-offset-3">
+                        <input type="button" name="edit-submit" id="edit-submit" tabindex="4" class="form-control btn btn-register" value="ADD Category">
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>      
+      
+      <hr>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  
+
+$(function() {
+
+    var loggedType = "";
+  $.ajax({
+    type: "POST",
+    url: "rest/user/logged",
+    dataType: "json",
+    success: function(logged) {
+      loggedType = logged.userType;
+    },
+    error: function(response, xhr) {
+        alert("You are not logged in added!");
+        window.location.replace("authentication.html");
+        var logbar = '<li><a href="authentication.html"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>';
+      $("#log-bar").append(logbar);
+    }
+  })
+
+});
+
+
+$("#edit-submit").click(function() {
+  var newCategory = {};
+  var name = $("#name-edit").val();
+  var core = $("#numberOfCores-edit").val();
+  var ram = $("#ram-edit").val()
+  var gpuCores = $("#numberOfGpuCores-list").val()
+ 
+  debugger;
+  if (name == "" || core == ""|| ram=="" || gpuCores == "") {
+      alert("Please fill in the entire form!");
+      return;
+  }
+  
+
+  
+  newCategory.name = name;
+  newCategory.numberOfCores =core;
+  newCategory.ram = ram;
+  newCategory.numberOfGpuCores = gpuCores;
+
+  
+  $.ajax({
+    type: "POST",
+    url: "rest/category/add",
+    contentType: "application/json",
+    data: JSON.stringify(newCategory),
+    success: function(response) {
+      alert("Category added!");
+      window.location.replace("category-view.html");
+    },
+    error: function(response, xhr) {
+      if (xhr == 400) {
+        alert("Please fill in the entire form correctly!");
+      } else if (xhr == 404) {
+        alert("Sorry! Category has not been found in the system");
+      } else if (xhr == 409) {
+        alert("Category with selected ID exists, change ID right now!!!");
+      }
+      window.location.reload();
+    }
+  })
+  
+  
+})
+
+
+</script>
+
+</body>
+</html>

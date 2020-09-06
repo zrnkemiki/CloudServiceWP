@@ -36,6 +36,7 @@
   <h2>CloudServiceWP</h2>
   <p>All organizations</p>            
   <table class="table table-striped">
+    <button class="btn btn-success" onclick="addOrganization()">Add new organization</button>
     <thead>
       <tr>
         <th>Name</th>
@@ -85,13 +86,30 @@
 
 
   function deleteOrganization(orgId) {
-      console.log(orgId);
-      console.log("Usao u delete");
-      alert("Uspesno obrisano!");
+      $.ajax({
+      type: "DELETE",
+      url: "rest/organization/" + orgId + "/delete/",
+      success: function() {
+        alert("Organization with id: " + orgId + " deleted successfully!")
+        window.location.reload();
+      },
+     error: function(xhr, status) {
+        if (xhr.status == 404) {
+          alert("Organization that you want to delete cannot be found!");
+        }
+        alert("Something went wrong while deleting Organization!");
+        window.location.replace("organizations-view.html");
+      }
+    })
+
   }
 
   function editOrganization(orgId) {
     window.location.replace("organization-edit.html?id=" + orgId);
+  }
+
+  function addOrganization(){
+    window.location.replace("add-organization.html");
   }
 
 

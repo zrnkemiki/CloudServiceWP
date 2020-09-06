@@ -15,41 +15,39 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import dto.DiskDTO;
 import dto.VirtualMachineDTO;
 import enums.UserType;
+import model.Disk;
 import model.User;
 import model.VirtualMachine;
+import service.DiskService;
 import service.VirtualMachineService;
-
 @Path("/")
-public class VirtualMachinesController {
-
+public class DiskController {
+	
 	@Context
 	ServletContext ctx;
 	@Context
 	HttpServletRequest request;
 
 	@GET
-	@Path("/vms/all")
+	@Path("/disk/all")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getAllVirtualMachines() {
-		Collection<VirtualMachine> allVMS = null;
+	public Response getAllDisks() {
+		Collection<Disk> alldisks = null;
 		User logged = (User) request.getSession().getAttribute("loggedUser");
-		if(logged == null) {
-			System.out.println("Korisnik nije ulogovan!");
-			return Response.status(Response.Status.FORBIDDEN).build();
-		}
 		if (logged.getUserType() == UserType.SUPERADMIN) {
-			allVMS = VirtualMachineService.getVirtualMachines(ctx).getVms().values();
-			return Response.ok(allVMS).build();
+			alldisks = DiskService.getDisks(ctx).getDisks().values();
+			return Response.ok(alldisks).build();
 		} else if (logged.getUserType() == UserType.ADMIN || logged.getUserType() == UserType.USER) {
-			return Response.ok(VirtualMachineService.getVMSbyUser(request, ctx)).build();
+			return Response.ok(DiskService.getDiskByUser(request, ctx)).build();
 		}
 		return Response.status(Response.Status.FORBIDDEN).build();
 	}
 
 	@GET
-	@Path("/vm/{id}")
+	@Path("/disk/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getVMByID(@PathParam("id") int id) {
 		User logged = (User) request.getSession().getAttribute("loggedUser");
@@ -62,7 +60,7 @@ public class VirtualMachinesController {
 	}
 	
 	@POST
-	@Path("/vm/{id}/edit")
+	@Path("/disk/{id}/edit")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response editVM(VirtualMachineDTO dto, @PathParam("id") int id) {
@@ -71,19 +69,20 @@ public class VirtualMachinesController {
 	}
 	
 	@DELETE
-	@Path("/vm/{id}/delete")
+	@Path("/disk/{id}/delete")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response deleteVM(@PathParam("id") int id) {
-		return VirtualMachineService.deleteVirtualMachine(id, request, ctx);
+		return DiskService.deleteDisk(id, ctx, request);
 	}
 	
 	@POST
-	@Path("/vm/add")
+	@Path("/disk/add")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response addVM(VirtualMachineDTO dto) {
-		return VirtualMachineService.addVirtualMachine(dto, ctx, request);
+	public Response addDisk(DiskDTO dto) {
+		return DiskService.addDisk(dto, ctx, request);
 	}
+
 
 }

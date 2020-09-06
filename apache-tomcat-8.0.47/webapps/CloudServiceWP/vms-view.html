@@ -36,6 +36,7 @@
   <h2>CloudServiceWP</h2>
   <p>All vms</p>            
   <table class="table table-striped">
+  	<button class="btn btn-success" onclick="addVm()">Add new virtual machine</button>
     <thead>
       <tr>
         <th>Name</th>
@@ -89,7 +90,8 @@
           panel += '<td>' + vm.category.numberOfCores + '</td>';
           panel += '<td>' + vm.category.ram + '</td>';
           panel += '<td>' + vm.numberOfGpuCores + '</td>';
-          panel += '<td><button class="btn btn-success" type="submit" onclick="editVM(&quot;' + vm.id + '&quot;)">EDIT/DETAILS</button></td>';
+          panel += '<td><button class="btn btn-success" type="submit" onclick="editVM(&quot;' + vm.id + '&quot;)">EDIT-VIEW</button>';
+          panel += '<button class="btn btn-danger" type="submit" onclick="deleteVM(&quot;' + vm.id + '&quot;)">DELETE</button></td>';
           panel += '</tr>'
 
           panels += panel;
@@ -105,15 +107,32 @@
 
 
   function deleteVM(vmID) {
-      console.log(orgId);
-      console.log("Usao u delete");
-      alert("Uspesno obrisano!");
+      console.log("Usao sam u delete activity");
+       $.ajax({
+      type: "DELETE",
+      url: "rest/vm/" + vmID + "/delete",
+      success: function() {
+        alert("VM with id: " + vmID + " deleted successfully!")
+        window.location.replace("vms-view.html");
+      },
+      error: function(xhr, status) {
+        if (xhr.status == 404) {
+          alert("Machine that you want to delete cannot be found!");
+        }
+        alert("Something went wrong while deleting vm!");
+        window.location.replace("vms-view.html");
+      }
+    })
   }
 
   function editVM(vmID) {
     window.location.replace("vm-edit.html?id=" + vmID);
   }
 
+
+  function addVm() {
+	window.location.replace("add-vm.html");
+  }
 
   </script>
 

@@ -23,7 +23,7 @@
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
-        <li class="active"><a href="user-edit.html">VM edit</a></li>
+        <li class="active"><a href="user-edit.html">VM add</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><a onclick="logout()" id="logout-btn"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
@@ -51,14 +51,11 @@
                     <input type="text" name="name-edit" id="name-edit" tabindex="1" class="form-control" placeholder="Name" value="">
                   </div>
                   <div class="form-group">
-                    <input type="text" name="organization-edit" id="organization-edit" tabindex="1" class="form-control" placeholder="organization">
-                  </div>
-                  <div class="form-group">
                     <form>
-					   <label>Izaberite kategoriju:</label>
-					  	<select name="type" id="category-list" onchange="setCategoryValues(value)">
-					  </label>
-					</form>
+          					   <label>Izaberite kategoriju:</label>
+          					  	<select name="type" id="category-list" onchange="setCategoryValues(value)">
+          					  </label>
+          					</form>
                   </div>
                   <div class="form-group">
                     <input type="text" name="cores-edit" id="cores-edit" tabindex="1" class="form-control" placeholder="cores" value="">
@@ -70,34 +67,19 @@
                     <input type="text" name="ram-edit" id="ram-edit" tabindex="1" class="form-control" placeholder="gpu cores" value="">
                   </div>
                    <div class="form-group">
-                    <table class="table table-striped">
-                      <thead>
-                        <tr>
-                          <th>Date on</th>
-                          <th>Date off</th>
-                        </tr>
-                      </thead>
-                     <tbody id="activity-list">
-                    </tbody>
-                    </table>
+                  <form>
+                       <label>Izaberite organizaciju:</label>
+                        <select name="type" id="organization-list">
+                      </label>
+                    </form>
                   </div>
-                  <div class="form-group">
-                    <table class="table table-striped">
-                      <thead>
-                        <tr>
-                          <th>Disk name</th>
-                          <th>Disk capacity</th>
-                          <th>Disk type</th>
-                        </tr>
-                      </thead>
-                     <tbody id="disk-list">
-                    </tbody>
-                    </table>
+                  <div>
+                    <label>TO DO ADD DISK!</label>
                   </div>
                   <div class="form-group">
                     <div class="row">
                        <div class="col-sm-6 col-sm-offset-3">
-                        <input type="button" name="edit-submit" id="edit-submit" tabindex="4" class="form-control btn btn-register" value="Update vm">
+                        <input type="button" name="edit-submit" id="edit-submit" tabindex="4" class="form-control btn btn-register" value="ADD vm">
                       </div>
                     </div>
                   </div>
@@ -117,10 +99,8 @@
 </div>
 
 <script>
-
-  var categoriesList = [];
-
-  function setCategoryValues(id){
+  
+function setCategoryValues(id){
   category = {};
   console.log(id)
   categoriesList.forEach(searchFun);
@@ -136,8 +116,8 @@
   $("#ram-edit").val(category.ram);
   $("#ram-edit").prop('disabled', true)
 }
-  
 
+var categoriesList = [];
 
 $(function() {
 	
@@ -163,6 +143,26 @@ $(function() {
       }
     })
 
+    $.ajax({
+      type: "GET",
+      url: "rest/organization/all",
+      dataType: "json",
+      success: function(organizations) {
+        var panels = "";
+        console.log(organizations);
+        $.each(organizations, function(i, organization) {
+          var panel = "";
+          panel += '<option value=' + organization.id + '>' + organization.name + '</option>';
+          panels += panel;
+        });
+        panels += '</select>'
+        $("#organization-list").append(panels);
+      },
+      error: function(response) {
+        alert("Something went wrong while getting organizations!");
+      }
+    })
+
 });
 
 var vmId = "";
@@ -182,88 +182,17 @@ $(function() {
 		}
 	})
 
-  const queryString = window.location.search;
-  const urlParams = new URLSearchParams(queryString);
-  vmId = urlParams.get('id')
-  $.ajax({
-    type: "GET",
-    url: "rest/vm/"+ vmId,
-    dataType: "json",
-    success: function(vm) {
-      if(loggedType == "USER"){
-      	$("#edit-submit").prop('disabled', true)
-      }
-      $("#name-edit").val(vm.name);
-      if(loggedType == "USER"){
-      	$("#name-edit").prop('disabled', true)
-      }
-      $("#organization-edit").val(vm.organization.name);
-      $("#organization-edit").prop('disabled', true)
-      $("#category-list").val(vm.category.id)
-      if(loggedType == "USER"){
-      	$("#category-list").prop('disabled', true)
-      }
-      $("#activity-list").empty();
-      var panels = "";
-      $.each(vm.activities, function(i, activity) {
-          var panel = "";
-          if(activity.dateOFF == undefined){
-            activity.dateOFF = "/"
-          }
-
-          panel += '<tr>'
-          panel += '<td>' + activity.dateON + '</td>';
-          panel += '<td>' + activity.dateOFF + '</td>';
-          if(loggedType == "SUPERADMIN"){
-          	 panel += '<td><button class="btn btn-danger" type="submit" onclick="deleteActivity(&quot;' + activity.id + '&quot;)">DELETE</button></td>';
-          }
-         
-          panel += '</tr>'
-
-          panels += panel;
-        });
-        $("#activity-list").append(panels);
-         var panels2 = "";
-      $.each(vm.disks, function(i, disk) {
-          var panel = "";
-          panel += '<tr>'
-          panel += '<td>' + disk.name + '</td>';
-          panel += '<td>' + disk.capacity + '</td>';
-          panel += '<td>' + disk.diskType + '</td>';
-          panel += '</tr>'
-
-          panels2 += panel;
-        });
-        $("#disk-list").append(panels2);
-    },
-    error: function(response) {
-      
-    }
-  })
+  
 })
 
-function deleteActivity(activityId) {
-    console.log("Usao sam u delete activity");
-       $.ajax({
-      type: "DELETE",
-      url: "rest/activity/" + activityId + "/delete",
-      dataType: "json", 
-      success: function() {
-        alert("Activity with id: " + activityId + " deleted successfully!")
-      	window.location.replace("vms-view.html");
-      },
-      error: function(response) {
-        alert("Something went wrong while deleting vm!");
-        window.location.replace("vms-view.html");
-      }
-    })
 
-  }
 
 $("#edit-submit").click(function() {
-  var editedVM = {};
+  var newVM = {};
   var name = $("#name-edit").val();
   var category = $("#category-list").val()
+  var organization = $("#organization-list").val()
+ 
   console.log(category);
   debugger;
   if (name == "" ) {
@@ -273,18 +202,18 @@ $("#edit-submit").click(function() {
   
 
   
-  editedVM.name = name;
-  editedVM.categoryId =category;
+  newVM.name = name;
+  newVM.categoryId =category;
+  newVM.organizationId = organization;
 
-  console.log(vmId);
   
   $.ajax({
     type: "POST",
-    url: "rest/vm/" + vmId + "/edit",
+    url: "rest/vm/add",
     contentType: "application/json",
-    data: JSON.stringify(editedVM),
+    data: JSON.stringify(newVM),
     success: function(response) {
-      alert("VM updated!");
+      alert("VM added!");
       window.location.replace("vms-view.html");
     },
     error: function(response, xhr) {
@@ -294,7 +223,7 @@ $("#edit-submit").click(function() {
       } else if (xhr == 404) {
         alert("Sorry! User has not been found in the system");
       } else if (xhr == 409) {
-        alert("editedVM with selected ID exists, change ID right now!!!");
+        alert("newVM with selected ID exists, change ID right now!!!");
       }
       window.location.reload();
     }

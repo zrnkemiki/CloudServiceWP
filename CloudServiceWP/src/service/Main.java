@@ -2,6 +2,7 @@ package service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
@@ -71,15 +72,15 @@ public class Main {
 		Activity activity2 = new Activity(2,LocalDateTime.now().minusHours(5), LocalDateTime.now());
 		
 
-		Disk disk = new Disk(0, "Disk1", o, DiskType.SSD, 2, 0);
-		Disk disk1 = new Disk(1, "Disk2", o, DiskType.SSD, 4, 1);
-		Disk disk2 = new Disk(2, "Disk3", o, DiskType.SSD, 3, 0);
+		Disk disk = new Disk(0, "Disk1", o, DiskType.SSD, 2, 1);
+		Disk disk1 = new Disk(1, "Disk2", o1, DiskType.SSD, 4, 2);
+		Disk disk2 = new Disk(2, "Disk3", o2, DiskType.SSD, 3, 3);
 		
 		
 		
-		VirtualMachine vm = new VirtualMachine(0, "VM1", o, category, category.getNumberOfCores(), category.getRam(), category.getNumberOfGpuCores(), new ArrayList<Disk>(), new ArrayList<Activity>());
-		VirtualMachine vm1 = new VirtualMachine(1, "VM2", o, category1, category1.getNumberOfCores(), category1.getRam(), category1.getNumberOfGpuCores(), new ArrayList<Disk>(), new ArrayList<Activity>());
-		VirtualMachine vm2 = new VirtualMachine(2, "VM3", o, category2, category2.getNumberOfCores(), category2.getRam(), category2.getNumberOfGpuCores(), new ArrayList<Disk>(), new ArrayList<Activity>());
+		VirtualMachine vm = new VirtualMachine(1, "VM1", o, category, category.getNumberOfCores(), category.getRam(), category.getNumberOfGpuCores(), new ArrayList<Disk>(), new ArrayList<Activity>());
+		VirtualMachine vm1 = new VirtualMachine(2, "VM2", o1, category1, category1.getNumberOfCores(), category1.getRam(), category1.getNumberOfGpuCores(), new ArrayList<Disk>(), new ArrayList<Activity>());
+		VirtualMachine vm2 = new VirtualMachine(3, "VM3", o2, category2, category2.getNumberOfCores(), category2.getRam(), category2.getNumberOfGpuCores(), new ArrayList<Disk>(), new ArrayList<Activity>());
 		vm.getDisks().add(disk);
 		vm1.getDisks().add(disk1);
 		vm2.getDisks().add(disk2);
@@ -116,6 +117,14 @@ public class Main {
 		activities.getActivities().put(activity2.getId(), activity2);
 		s = jsonb.toJson(activities);
 		System.out.println(s);
+	
+		HashMap<Integer, String> mapa = new HashMap<Integer, String>();
+		mapa.put(1, "a");
+		mapa.put(2, "b");
+		
+		System.out.println(mapa.keySet());
+		int b = 1;
+		mapa.remove(b);
+		System.out.println(mapa.keySet());
 	}
-
 }

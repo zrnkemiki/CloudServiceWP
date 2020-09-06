@@ -23,7 +23,7 @@
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
-        <li class="active"><a >VMS view</a></li>
+        <li class="active"><a >DISKS view</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><a onclick="logout()" id="logout-btn"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
@@ -36,23 +36,23 @@
   <h2>CloudServiceWP</h2>
   <p>All vms</p>            
   <table class="table table-striped">
-  	<button class="btn btn-success" onclick="addVm()">Add new virtual machine</button>
+  	<button class="btn btn-success" onclick="addVm()">Add new disk</button>
     <thead>
       <tr>
-        <th>Name</th>
-        <th>Organization</th>
-        <th>Broj jezgara</th>
-        <th>Ram</th>
-        <th>GPU Jezgra</th>
+        <th>Ime</th>
+        <th>Kapacitet</th>
+        <th>Virtuelna masina</th>
       </tr>
     </thead>
-    <tbody id="vms-list">
+    <tbody id="disks-list">
     </tbody>
   </table>
 </div>
 
 <script>
 
+
+var vmsList = [];
 
  $(function() {
 
@@ -70,33 +70,14 @@
 		}
 	})
 
-
-
-    $("#vms-list").empty();
-
     $.ajax({
       type: "GET",
       url: "rest/vms/all",
       dataType: "json",
       success: function(vms) {
-        var panels = "";
-        console.log("Ovo su organizacije: " + JSON.stringify(vms));
-        $.each(vms, function(i, vm) {
-          var panel = "";
-          console.log("Ovo je vm: " + JSON.stringify(vm));
-          panel += '<tr>'
-          panel += '<td>' + vm.name + '</td>';
-          panel += '<td>' + vm.organization.name + '</td>';
-          panel += '<td>' + vm.category.numberOfCores + '</td>';
-          panel += '<td>' + vm.category.ram + '</td>';
-          panel += '<td>' + vm.numberOfGpuCores + '</td>';
-          panel += '<td><button class="btn btn-success" type="submit" onclick="editVM(&quot;' + vm.id + '&quot;)">EDIT-VIEW</button>';
-          panel += '<button class="btn btn-danger" type="submit" onclick="deleteVM(&quot;' + vm.id + '&quot;)">DELETE</button></td>';
-          panel += '</tr>'
-
-          panels += panel;
-        });
-        $("#vms-list").append(panels);
+        vmsList = vms;
+        console.log(vmsList);
+        getDisks(vmsList);
       },
       error: function(response) {
         alert("Something went wrong while getting virtual machines!");
@@ -105,33 +86,73 @@
 
   })
 
+  function getDisks(vmsList){
+    $("#disks-list").empty();
 
-  function deleteVM(vmID) {
-      console.log("Usao sam u delete activity");
-       $.ajax({
-      type: "DELETE",
-      url: "rest/vm/" + vmID + "/delete",
-      success: function() {
-        alert("VM with id: " + vmID + " deleted successfully!")
-        window.location.replace("vms-view.html");
+    $.ajax({
+      type: "GET",
+      url: "rest/disk/all",
+      dataType: "json",
+      success: function(disks) {
+        var panels = "";
+        console.log("Ovo su diskovi: " + JSON.stringify(disks));
+        $.each(disks, function(i, disk) {
+          var panel = "";
+          var vmName = "";
+          panel += '<tr>'
+          panel += '<td>' + disk.name + '</td>';
+          panel += '<td>' + disk.capacity + '</td>';
+          debugger;
+          vmsList.forEach(searchFun);
+          function searchFun(value, index, array){
+            console.log(value)
+            if(value.id == disk.vmId){
+              vmName = value.name;
+            }
+          }
+          panel += '<td>' + vmName + '</td>';
+          panel += '<td><button class="btn btn-success" type="submit" onclick="editDisk(&quot;' + disk.id + '&quot;)">EDIT-VIEW</button>';
+          panel += '<button class="btn btn-danger" type="submit" onclick="deleteDisk(&quot;' + disk.id + '&quot;)">DELETE</button></td>';
+          panel += '</tr>'
+
+          panels += panel;
+        });
+        $("#disks-list").append(panels);
       },
-      error: function(xhr, status) {
-        if (xhr.status == 404) {
-          alert("Machine that you want to delete cannot be found!");
-        }
-        alert("Something went wrong while deleting vm!");
-        window.location.replace("vms-view.html");
+      error: function(response) {
+        alert("Something went wrong while getting disks!");
       }
     })
+
   }
 
-  function editVM(vmID) {
-    window.location.replace("vm-edit.html?id=" + vmID);
+
+  function deleteDisk(diskID) {
+     $.ajax({
+      type: "DELETE",
+      url: "rest/disk/" + diskID + "/delete/",
+      success: function() {
+        alert("Disk with id: " + diskID + " deleted successfully!")
+        window.location.reload();
+      },
+     error: function(xhr, status) {
+        if (xhr.status == 404) {
+          alert("Disk that you want to delete cannot be found!");
+        }
+        alert("Something went wrong while deleting Disk!");
+        window.location.replace("disks-view.html");
+      }
+    })
+
+  }
+
+  function editDisk(diskID) {
+    window.location.replace("disk-edit.html?id=" + diskID);
   }
 
 
   function addVm() {
-	window.location.replace("add-vm.html");
+	window.location.replace("add-disk.html");
   }
 
   </script>

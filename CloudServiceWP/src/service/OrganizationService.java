@@ -28,7 +28,10 @@ public class OrganizationService {
 	public static Organizations getOrganizationsForFrontEnd(HttpServletRequest request, ServletContext ctx) {
 		User logged = (User) request.getSession().getAttribute("loggedUser");
 		Organizations organizations = new Organizations();
-		if (logged.getUserType() == UserType.ADMIN) {
+		if (logged == null) {
+			System.out.println("Korisnik nije ulogovan!");
+
+		} else if (logged.getUserType() == UserType.ADMIN) {
 			organizations.getOrganizations().put(logged.getOrganization().getId(), logged.getOrganization());
 		} else if (logged.getUserType() == UserType.SUPERADMIN) {
 			organizations = getOrganizations(ctx);
@@ -148,13 +151,12 @@ public class OrganizationService {
 
 		o.setName(edited.getName());
 		o.setAbout(edited.getAbout());
-		if(!(edited.getLogo() == null)) {
+		if (!(edited.getLogo() == null)) {
 			o.setLogo(edited.getLogo());
 		}
 		Organizations orgs = getOrganizations(ctx);
 		orgs.getOrganizations().replace(o.getId(), o);
 		saveOrganizations(ctx, orgs);
-		
 
 		return Response.status(Response.Status.OK).build();
 	}

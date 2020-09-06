@@ -28,53 +28,51 @@ public class OrganizationController {
 	ServletContext ctx;
 	@Context
 	HttpServletRequest request;
-	
-	
+
 	@GET
 	@Path("/organization/all")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAllOrganizations() {
 		Collection<Organization> allOrganizations = new ArrayList<Organization>();
 		User logged = (User) request.getSession().getAttribute("loggedUser");
-		if(logged.getUserType() == UserType.SUPERADMIN) {
+		if (logged == null) {
+			return Response.status(Response.Status.FORBIDDEN).build();
+		} else if (logged.getUserType() == UserType.SUPERADMIN) {
 			allOrganizations = OrganizationService.getOrganizations(ctx).getOrganizations().values();
 			return Response.ok(allOrganizations).build();
-		}
-		else if(logged.getUserType() == UserType.ADMIN){
+		} else if (logged.getUserType() == UserType.ADMIN) {
 			allOrganizations.add(OrganizationService.getOrganizationByID(logged.getOrganization().getId(), ctx));
 			return Response.ok(allOrganizations).build();
 		}
 		return Response.status(Response.Status.FORBIDDEN).build();
 	}
-	
-	
+
 	@GET
 	@Path("/organization/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getOrganizationByID(@PathParam("id") int id) {
 		User logged = (User) request.getSession().getAttribute("loggedUser");
-		if(logged == null) {
+		if (logged == null) {
 			return Response.status(Response.Status.FORBIDDEN).build();
 		}
 		Organization org = OrganizationService.getOrganizationByID(id, ctx);
 		System.out.println("Org:" + org.getAbout());
 		return Response.status(Response.Status.OK).entity(org).build();
-		
+
 	}
-	
-	
+
 	@POST
 	@Path("/organization/{id}/edit")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response editUser(OrganizationDTO edited, @PathParam("id") int id) {
 		User logged = (User) request.getSession().getAttribute("loggedUser");
-		if(logged.getUserType() != UserType.SUPERADMIN || logged.getUserType() != UserType.ADMIN ) {
+		if (logged.getUserType() != UserType.SUPERADMIN || logged.getUserType() != UserType.ADMIN) {
 			return OrganizationService.editOrganization(edited, id, ctx, request);
 		}
 		return Response.status(Response.Status.FORBIDDEN).build();
-		
+
 	}
-	
+
 	@POST
 	@Path("/organization/add")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -82,6 +80,5 @@ public class OrganizationController {
 	public Response addOrganization(OrganizationDTO dto) {
 		return OrganizationService.addOrganization(dto, request, ctx);
 	}
-	
-	
+
 }

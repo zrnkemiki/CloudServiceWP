@@ -18,6 +18,8 @@ function printNav(page) {
 					navItems += '<li><a href="users-view.html">View users</a></li>';
 					navItems += '<li><a href="organizations-view.html">View organizations</a></li>';
 					navItems += '<li><a href="vms-view.html">View Virtual machines</a></li>';
+					navItems += '<li><a href="disks-view.html">View Disks</a></li>';
+					navItems += '<li><a href="categories-view.html">View Categories</a></li>';
 					$("#myNavbarList").append(navItems);
 				}
 			}
@@ -27,6 +29,8 @@ function printNav(page) {
 					navItems += '<li><a href="users-view.html">View users</a></li>';
 					navItems += '<li><a href="organization-edit.html?id=' + logged.organization.id + '">My organization</a></li>';
 					navItems += '<li><a href="vms-view.html">View Virtual machines</a></li>';
+					navItems += '<li><a href="disks-view.html">View Disks</a></li>';
+					navItems += '<li><a href="categories-view.html">View Categories</a></li>';
 					$("#myNavbarList").append(navItems);
 				}
 			}

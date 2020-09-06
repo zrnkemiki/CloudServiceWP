@@ -38,7 +38,11 @@ public class UserService {
 	// organizaciju samog admina koji poziva funkciju
 	public static Response addUser(UserDTO dto, HttpServletRequest request, ServletContext ctx) {
 		User logged = (User) request.getSession().getAttribute("loggedUser");
-		if (logged.getUserType() == UserType.ADMIN) {
+		if(logged == null) {
+			System.out.println("Korisnik nije ulogovan!");
+			return Response.status(Response.Status.FORBIDDEN).build();
+		}
+		else if (logged.getUserType() == UserType.ADMIN) {
 			dto.setOrganization(logged.getOrganization());
 		}
 		else if(logged.getUserType() == UserType.SUPERADMIN){
