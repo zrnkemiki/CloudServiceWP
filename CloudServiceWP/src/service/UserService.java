@@ -2,16 +2,22 @@ package service;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
+
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 
 import dto.CredentialsDTO;
 import dto.UserDTO;
@@ -30,19 +36,22 @@ public class UserService {
 	// isto moze da dodaje i korisnika i admina
 	// ali je polje 'organizacija' uvek inicijalizovano na
 	// organizaciju samog admina koji poziva funkciju
-	public static User addUser(UserDTO dto, HttpServletRequest request, ServletContext ctx) {
+	public static Response addUser(UserDTO dto, HttpServletRequest request, ServletContext ctx) {
 		User logged = (User) request.getSession().getAttribute("loggedUser");
 		if (logged.getUserType() == UserType.ADMIN) {
 			dto.setOrganization(logged.getOrganization());
 		}
-		// dto.setOrganization(OrganizationService.getOrganizationID(dto.getOrganizationId()));
+		else if(logged.getUserType() == UserType.SUPERADMIN){
+			dto.setOrganization(OrganizationService.getOrganizationByID(dto.getOrganizationId(), ctx));
+			
+		}
 		User newUser = new User(dto);
 		Users allUsers = getUsers(ctx);
 		newUser.setId(allUsers.getUsers().size() + 1);
 		allUsers.getUsers().put(newUser.getEmail(), newUser);
 
 		saveUsers(ctx, allUsers);
-		return newUser;
+		return Response.status(Response.Status.CREATED).build();
 	}
 
 	// SUPER ADMINISTRATOR:
@@ -211,5 +220,31 @@ public class UserService {
 
 		return null;
 	}
+	
+	public static boolean saveImageToDiskRegister(InputStream uploadedInputStream,
+			FormDataContentDisposition fileDetail,
+			String pictureName, ServletContext ctx, int option) {
+
+		String extension = "." + fileDetail.getFileName().split("\\.")[1];
+
+		String uploadedFileLocation = ctx.getRealPath("") + "images/" + pictureName + extension;
+		try {
+			OutputStream out = new FileOutputStream(new File(uploadedFileLocation));
+			int read = 0;
+			byte[] bytes = new byte[1024];
+
+			out = new FileOutputStream(new File(uploadedFileLocation));
+			while ((read = uploadedInputStream.read(bytes)) != -1) {
+				out.write(bytes, 0, read);
+			}
+			out.flush();
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return true;
+	}
+
 
 }

@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.json.bind.Jsonb;
@@ -16,12 +18,14 @@ import javax.ws.rs.core.Response;
 
 import dto.VirtualMachineDTO;
 import enums.UserType;
+import model.Organization;
+import model.Organizations;
 import model.User;
 import model.VirtualMachine;
 import model.VirtualMachines;
 
 public class VirtualMachineService {
-	
+
 	private static BufferedWriter bw;
 	private static FileWriter fw;
 
@@ -32,17 +36,20 @@ public class VirtualMachineService {
 	 * 
 	 * ovo isto moze da vraca ili VirtualMachines ili List<VirtualMachine>
 	 */
-	public static VirtualMachines getAllVms(HttpServletRequest request, ServletContext ctx) {
+	public static List<VirtualMachine> getVMSbyUser(HttpServletRequest request, ServletContext ctx) {
 		User logged = (User) request.getSession().getAttribute("loggedUser");
 		VirtualMachines vms = null;
-		if (logged.getUserType() == UserType.SUPERADMIN) {
-
-		} else if (logged.getUserType() == UserType.ADMIN) {
-
-		} else {
-
+		List<VirtualMachine> returnVms = new ArrayList<VirtualMachine>();
+		if (logged.getUserType() == UserType.ADMIN || logged.getUserType() == UserType.USER) {
+			vms = getVirtualMachines(ctx);
+			Collection<VirtualMachine> collectionvms = vms.getVms().values();
+			for (VirtualMachine vmTemp : collectionvms) {
+				if (vmTemp.getOrganization().getId() == logged.getOrganization().getId()) {
+					returnVms.add(vmTemp);
+				}
+			}
 		}
-		return vms;
+		return returnVms;
 	}
 
 	/*
@@ -52,9 +59,29 @@ public class VirtualMachineService {
 	 * pregleda aktivnosti, ne moze da ih menja KORISNIK: moze samo da vidi VM ne
 	 * moze nista da menja
 	 */
-	public static VirtualMachine editVirtualMachine() {
+	public static Response editVirtualMachine(VirtualMachineDTO dto, int id, HttpServletRequest request, ServletContext ctx) {
+		VirtualMachine vm = getVirtualMachineByID(id, ctx);
+		// ako neko polje nije popunjeno, vrati gresku
+		if (dto.getName().equals("")) {
+			return Response.status(Response.Status.BAD_REQUEST).build();
+		}
 
-		return null;
+		if (vm == null) {
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
+
+		vm.setName(dto.getName());
+		vm.setCategory(CategoryService.getCategoryByID(dto.getCategoryId(), ctx));
+		vm.setNumberOfCores(vm.getCategory().getNumberOfCores());
+		vm.setNumberOfGpuCores(vm.getNumberOfGpuCores());
+		vm.setRam(vm.getRam());
+		
+		VirtualMachines vms = getVirtualMachines(ctx);
+		vms.getVms().replace(vm.getId(), vm);
+		saveVirtualMachines(ctx, vms);
+		
+
+		return Response.status(Response.Status.OK).build();
 	}
 
 	/*
@@ -69,7 +96,7 @@ public class VirtualMachineService {
 
 	// SUPER ADMIN ili ADMIN
 	public static Response deleteVirtualMachine(int id, HttpServletRequest request, ServletContext ctx) {
-		VirtualMachines vms = getAllVms(request, ctx);
+		VirtualMachines vms = getVirtualMachines(ctx);
 		vms.getVms().remove(id);
 		return Response.status(Response.Status.OK).build();
 	}
@@ -89,9 +116,9 @@ public class VirtualMachineService {
 
 		return vms;
 	}
-	
+
 	public static VirtualMachines loadVirtualMachines(String path) {
-		path += "/data/virtualMachines.txt";
+		path += "/data/vms.txt";
 		BufferedReader in = null;
 		VirtualMachines vms = null;
 		try {
@@ -112,10 +139,9 @@ public class VirtualMachineService {
 		}
 		return vms;
 	}
-	
 
-	public static void saveOrganizations(ServletContext ctx, VirtualMachines allvms) {
-		String path = ctx.getRealPath("") + "/data/virtualMachines.txt";
+	public static void saveVirtualMachines(ServletContext ctx, VirtualMachines allvms) {
+		String path = ctx.getRealPath("") + "/data/vms.txt";
 
 		String data = "";
 		Jsonb jsonb = JsonbBuilder.create();
@@ -131,6 +157,18 @@ public class VirtualMachineService {
 			e.printStackTrace();
 		}
 		ctx.removeAttribute("virtualmachines");
+	}
+
+	public static VirtualMachine getVirtualMachineByID(int id, ServletContext ctx) {
+		VirtualMachines vms = getVirtualMachines(ctx);
+		VirtualMachine vm = null;
+		Collection<VirtualMachine> collectionvms = vms.getVms().values();
+		for (VirtualMachine vmTemp : collectionvms) {
+			if (vmTemp.getId() == id) {
+				vm = vmTemp;
+			}
+		}
+		return vm;
 	}
 
 }

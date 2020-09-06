@@ -9,19 +9,21 @@ public class Disk {
 	private Organization organization;
 	private DiskType diskType;
 	private int capacity;
+	private int vmId;
 
 	public Disk() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public Disk(int id, String name, Organization organization, DiskType diskType, int capacity, VirtualMachine vm) {
+	public Disk(int id, String name, Organization organization, DiskType diskType, int capacity, int virtualMachineId) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.organization = organization;
 		this.diskType = diskType;
 		this.capacity = capacity;
+		this.vmId = virtualMachineId;
 	}
 
 	public int getId() {
@@ -64,5 +66,12 @@ public class Disk {
 		this.capacity = capacity;
 	}
 
+	public int getVmId() {
+		return vmId;
+	}
+
+	public void setVmId(int vmId) {
+		this.vmId = vmId;
+	}
 
 }

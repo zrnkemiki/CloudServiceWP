@@ -1,16 +1,21 @@
 package service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 
-import enums.UserType;
+import enums.DiskType;
+import model.Activities;
+import model.Activity;
+import model.Categories;
+import model.CategoryVM;
+import model.Disk;
+import model.Disks;
 import model.Organization;
-import model.Organizations;
-import model.User;
-import model.Users;
 import model.VirtualMachine;
+import model.VirtualMachines;
 
 public class Main {
 
@@ -21,6 +26,7 @@ public class Main {
 		Organization o1 = new Organization(1, "Organizacija 1",  "Organizacija 1",  "Organizacija 1", new ArrayList<Integer>(), new ArrayList<Integer>());
 		Organization o2 = new Organization(2, "Organizacija 2",  "Organizacija 2",  "Organizacija 2", new ArrayList<Integer>(), new ArrayList<Integer>());
 		Organization o3 = new Organization(3, "Organizacija 3", "Organizacija 3",  "Organizacija 3", new ArrayList<Integer>(), new ArrayList<Integer>());
+		/*
 		User u1 = new User(0, "admin1", "a", "test", "test", "test", "test", o, UserType.ADMIN);
 		User u2 = new User(1, "superadmin", "a", "test", "test", "test", "test", o, UserType.SUPERADMIN);
 		User u3 = new User(2, "user1", "a", "test", "test", "test", "test", o, UserType.USER);
@@ -54,8 +60,62 @@ public class Main {
 		Organization nova = org.getOrganizations().get(0);
 		System.out.println(nova.getAbout());
 		
+		*/
+		CategoryVM category = new CategoryVM(0, "Kategorija 1", 8, 2, 4);
+		CategoryVM category1 = new CategoryVM(1, "Kategorija 2", 16, 64, 4);
+		CategoryVM category2 = new CategoryVM(2, "Kategorija 3", 10, 16, 8);
+		
+		
+		Activity activity = new Activity(0,LocalDateTime.now().minusDays(30), null);
+		Activity activity1 = new Activity(1,LocalDateTime.now().minusDays(10), LocalDateTime.now());
+		Activity activity2 = new Activity(2,LocalDateTime.now().minusHours(5), LocalDateTime.now());
 		
 
+		Disk disk = new Disk(0, "Disk1", o, DiskType.SSD, 2, 0);
+		Disk disk1 = new Disk(1, "Disk2", o, DiskType.SSD, 4, 1);
+		Disk disk2 = new Disk(2, "Disk3", o, DiskType.SSD, 3, 0);
+		
+		
+		
+		VirtualMachine vm = new VirtualMachine(0, "VM1", o, category, category.getNumberOfCores(), category.getRam(), category.getNumberOfGpuCores(), new ArrayList<Disk>(), new ArrayList<Activity>());
+		VirtualMachine vm1 = new VirtualMachine(1, "VM2", o, category1, category1.getNumberOfCores(), category1.getRam(), category1.getNumberOfGpuCores(), new ArrayList<Disk>(), new ArrayList<Activity>());
+		VirtualMachine vm2 = new VirtualMachine(2, "VM3", o, category2, category2.getNumberOfCores(), category2.getRam(), category2.getNumberOfGpuCores(), new ArrayList<Disk>(), new ArrayList<Activity>());
+		vm.getDisks().add(disk);
+		vm1.getDisks().add(disk1);
+		vm2.getDisks().add(disk2);
+		vm.getActivities().add(activity1);
+		vm.getActivities().add(activity2);
+		vm.getActivities().add(activity);
+		
+		Jsonb jsonb = JsonbBuilder.create();
+		VirtualMachines vms = new VirtualMachines();
+		vms.getVms().put(vm.getId(), vm);
+		vms.getVms().put(vm1.getId(), vm1);
+		vms.getVms().put(vm2.getId(), vm2);
+		
+		String s = jsonb.toJson(vms);
+		System.out.println(s);
+		
+		Disks disks = new Disks();
+		disks.getDisks().put(disk.getId(), disk);
+		disks.getDisks().put(disk1.getId(), disk1);
+		disks.getDisks().put(disk2.getId(), disk2);
+		s = jsonb.toJson(disks);
+		System.out.println(s);
+		
+		Categories categories = new Categories();
+		categories.getCategories().put(category.getId(), category);
+		categories.getCategories().put(category1.getId(), category1);
+		categories.getCategories().put(category2.getId(), category2);
+		s = jsonb.toJson(categories);
+		System.out.println(s);
+		
+		Activities activities = new Activities();
+		activities.getActivities().put(activity.getId(), activity);
+		activities.getActivities().put(activity1.getId(), activity1);
+		activities.getActivities().put(activity2.getId(), activity2);
+		s = jsonb.toJson(activities);
+		System.out.println(s);
 	}
 
 }

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>VMS</title>
+  <meta charset="ISO-8859-1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="js/globalFunctions.js"></script>
+  <script type="text/javascript" src="js/index.js"></script>
+
+  <link rel="stylesheet" href="css/authentication.css">
+  <link rel="stylesheet" href="css/style.css">
+
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="index.html">Home</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li class="active"><a >VMS view</a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a onclick="logout()" id="logout-btn"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <h2>CloudServiceWP</h2>
+  <p>All vms</p>            
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Organization</th>
+        <th>Broj jezgara</th>
+        <th>Ram</th>
+        <th>GPU Jezgra</th>
+      </tr>
+    </thead>
+    <tbody id="vms-list">
+    </tbody>
+  </table>
+</div>
+
+<script>
+
+
+ $(function() {
+
+ 	var loggedType = "";
+	$.ajax({
+		type: "POST",
+		url: "rest/user/logged",
+		dataType: "json",
+		success: function(logged) {
+			loggedType = logged.userType;
+		},
+		error: function(response, xhr) {
+			var logbar = '<li><a href="authentication.html"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>';
+			$("#log-bar").append(logbar);
+		}
+	})
+
+
+
+    $("#vms-list").empty();
+
+    $.ajax({
+      type: "GET",
+      url: "rest/vms/all",
+      dataType: "json",
+      success: function(vms) {
+        var panels = "";
+        console.log("Ovo su organizacije: " + JSON.stringify(vms));
+        $.each(vms, function(i, vm) {
+          var panel = "";
+          console.log("Ovo je vm: " + JSON.stringify(vm));
+          panel += '<tr>'
+          panel += '<td>' + vm.name + '</td>';
+          panel += '<td>' + vm.organization.name + '</td>';
+          panel += '<td>' + vm.category.numberOfCores + '</td>';
+          panel += '<td>' + vm.category.ram + '</td>';
+          panel += '<td>' + vm.numberOfGpuCores + '</td>';
+          panel += '<td><button class="btn btn-success" type="submit" onclick="editVM(&quot;' + vm.id + '&quot;)">EDIT/DETAILS</button></td>';
+          panel += '</tr>'
+
+          panels += panel;
+        });
+        $("#vms-list").append(panels);
+      },
+      error: function(response) {
+        alert("Something went wrong while getting virtual machines!");
+      }
+    })
+
+  })
+
+
+  function deleteVM(vmID) {
+      console.log(orgId);
+      console.log("Usao u delete");
+      alert("Uspesno obrisano!");
+  }
+
+  function editVM(vmID) {
+    window.location.replace("vm-edit.html?id=" + vmID);
+  }
+
+
+  </script>
+
+</body>
+</html>

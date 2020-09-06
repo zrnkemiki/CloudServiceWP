@@ -1,11 +1,11 @@
 package controller;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -16,12 +16,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import dto.OrganizationDTO;
-import dto.UserDTO;
 import enums.UserType;
 import model.Organization;
 import model.User;
 import service.OrganizationService;
-import service.UserService;
 
 @Path("/")
 public class OrganizationController {
@@ -32,12 +30,11 @@ public class OrganizationController {
 	HttpServletRequest request;
 	
 	
-	@SuppressWarnings("null")
 	@GET
 	@Path("/organization/all")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAllOrganizations() {
-		Collection<Organization> allOrganizations = null;
+		Collection<Organization> allOrganizations = new ArrayList<Organization>();
 		User logged = (User) request.getSession().getAttribute("loggedUser");
 		if(logged.getUserType() == UserType.SUPERADMIN) {
 			allOrganizations = OrganizationService.getOrganizations(ctx).getOrganizations().values();
@@ -76,6 +73,14 @@ public class OrganizationController {
 		}
 		return Response.status(Response.Status.FORBIDDEN).build();
 		
+	}
+	
+	@POST
+	@Path("/organization/add")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response addOrganization(OrganizationDTO dto) {
+		return OrganizationService.addOrganization(dto, request, ctx);
 	}
 	
 	

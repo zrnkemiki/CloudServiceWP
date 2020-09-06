@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>VM Profile</title>
+	<meta charset="ISO-8859-1">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="js/globalFunctions.js"></script>
+  <script type="text/javascript" src="js/index.js"></script>
+
+  <link rel="stylesheet" href="css/authentication.css">
+  <link rel="stylesheet" href="css/style.css">
+
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="index.html">Home</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="user-edit.html">VM edit</a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a onclick="logout()" id="logout-btn"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid text-center">    
+  <div class="row content">
+    <div class="col-sm-8 text-left"> 
+      <div class="container">
+      <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        <div class="panel panel-login">
+          <div class="panel-heading">
+            <h3>Virtual machine</h3>
+            <hr>
+          </div>
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-lg-12">
+                <form id="register-form" role="form" style="display: block;">
+                  <div class="form-group">
+                    <input type="text" name="name-edit" id="name-edit" tabindex="1" class="form-control" placeholder="Name" value="">
+                  </div>
+                  <div class="form-group">
+                    <input type="text" name="organization-edit" id="organization-edit" tabindex="1" class="form-control" placeholder="organization">
+                  </div>
+                  <div class="form-group">
+                    <form>
+					   <label>Izaberite kategoriju:</label>
+					  	<select name="type" id="category-list">
+					  </label>
+					</form>
+                  </div>
+                  <div class="form-group">
+                    <input type="text" name="cores-edit" id="cores-edit" tabindex="1" class="form-control" placeholder="cores" value="">
+                  </div>
+                  <div class="form-group">
+                    <input type="text" name="gpu-cores-edit" id="gpu-cores-edit" tabindex="1" class="form-control" placeholder="gpu cores" value="">
+                  </div>
+                  <div class="form-group">
+                    <input type="text" name="ram-edit" id="ram-edit" tabindex="1" class="form-control" placeholder="gpu cores" value="">
+                  </div>
+                   <div class="form-group">
+                    <table class="table table-striped">
+                      <thead>
+                        <tr>
+                          <th>Date on</th>
+                          <th>Date off</th>
+                        </tr>
+                      </thead>
+                     <tbody id="activity-list">
+                    </tbody>
+                    </table>
+                  </div>
+                  <div class="form-group">
+                    <table class="table table-striped">
+                      <thead>
+                        <tr>
+                          <th>Disk name</th>
+                          <th>Disk capacity</th>
+                          <th>Disk type</th>
+                        </tr>
+                      </thead>
+                     <tbody id="disk-list">
+                    </tbody>
+                    </table>
+                  </div>
+                  <div class="form-group">
+                    <div class="row">
+                       <div class="col-sm-6 col-sm-offset-3">
+                        <input type="button" name="edit-submit" id="edit-submit" tabindex="4" class="form-control btn btn-register" value="Update vm">
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>      
+      
+      <hr>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  
+
+
+$(function() {
+	
+
+    $.ajax({
+      type: "GET",
+      url: "rest/category/all",
+      dataType: "json",
+      success: function(categories) {
+        var panels = "";
+       	console.log(categories);
+        $.each(categories, function(i, category) {
+          var panel = "";
+          panel += '<option value=' + category.id + '>' + category.name + '</option>';
+          panels += panel;
+        });
+        panels += '</select>'
+        $("#category-list").append(panels);
+      },
+      error: function(response) {
+        alert("Something went wrong while getting categories!");
+      }
+    })
+
+});
+
+var vmId = "";
+
+$(function() {
+	var loggedType = "";
+	$.ajax({
+		type: "POST",
+		url: "rest/user/logged",
+		dataType: "json",
+		success: function(logged) {
+			loggedType = logged.userType;
+		},
+		error: function(response, xhr) {
+			var logbar = '<li><a href="authentication.html"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>';
+			$("#log-bar").append(logbar);
+		}
+	})
+
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+  vmId = urlParams.get('id')
+  $.ajax({
+    type: "GET",
+    url: "rest/vm/"+ vmId,
+    dataType: "json",
+    success: function(vm) {
+      if(loggedType == "USER"){
+      	$("#edit-submit").prop('disabled', true)
+      }
+      $("#name-edit").val(vm.name);
+      if(loggedType == "USER"){
+      	$("#name-edit").prop('disabled', true)
+      }
+      $("#organization-edit").val(vm.organization.name);
+      $("#organization-edit").prop('disabled', true)
+      $("#cores-edit").val(vm.category.numberOfCores);
+      $("#cores-edit").prop('disabled', true)
+      $("#gpu-cores-edit").val(vm.category.numberOfGpuCores);
+      $("#gpu-cores-edit").prop('disabled', true)
+      $("#ram-edit").val(vm.category.ram);
+      $("#ram-edit").prop('disabled', true)
+      $("#category-list").val(vm.category.id)
+      if(loggedType == "USER"){
+      	$("#category-list").prop('disabled', true)
+      }
+      $("#activity-list").empty();
+      var panels = "";
+      $.each(vm.activities, function(i, activity) {
+          var panel = "";
+          if(activity.dateOFF == undefined){
+            activity.dateOFF = "/"
+          }
+
+          panel += '<tr>'
+          panel += '<td>' + activity.dateON + '</td>';
+          panel += '<td>' + activity.dateOFF + '</td>';
+          if(loggedType == "SUPERADMIN"){
+          	 panel += '<td><button class="btn btn-danger" type="submit" onclick="deleteActivity(&quot;' + activity.id + '&quot;)">DELETE</button></td>';
+          }
+         
+          panel += '</tr>'
+
+          panels += panel;
+        });
+        $("#activity-list").append(panels);
+         var panels2 = "";
+      $.each(vm.disks, function(i, disk) {
+          var panel = "";
+          panel += '<tr>'
+          panel += '<td>' + disk.name + '</td>';
+          panel += '<td>' + disk.capacity + '</td>';
+          panel += '<td>' + disk.diskType + '</td>';
+          panel += '</tr>'
+
+          panels2 += panel;
+        });
+        $("#disk-list").append(panels2);
+    },
+    error: function(response) {
+      
+    }
+  })
+})
+
+function deleteActivity(activityId) {
+    console.log("Usao sam u delete activity");
+       $.ajax({
+      type: "DELETE",
+      url: "rest/activity/" + activityId + "/delete",
+      dataType: "json", 
+      success: function() {
+        alert("Activity with id: " + activityId + " deleted successfully!")
+      	window.location.replace("vms-view.html");
+      },
+      error: function(response) {
+        alert("Something went wrong while deleting vm!");
+        window.location.replace("vms-view.html");
+      }
+    })
+
+  }
+
+$("#edit-submit").click(function() {
+  var editedVM = {};
+  var name = $("#name-edit").val();
+  var category = $("#category-list").val()
+  console.log(category);
+  debugger;
+  if (name == "" ) {
+      alert("Please fill in the entire form!");
+      return;
+  }
+  
+
+  
+  editedVM.name = name;
+  editedVM.categoryId =category;
+
+  console.log(vmId);
+  
+  $.ajax({
+    type: "POST",
+    url: "rest/vm/" + vmId + "/edit",
+    contentType: "application/json",
+    data: JSON.stringify(editedVM),
+    success: function(response) {
+      alert("VM updated!");
+      window.location.replace("vms-view.html");
+    },
+    error: function(response, xhr) {
+      console.log("usao u error????");
+      if (xhr == 400) {
+        alert("Please fill in the entire form correctly!");
+      } else if (xhr == 404) {
+        alert("Sorry! User has not been found in the system");
+      } else if (xhr == 409) {
+        alert("editedVM with selected ID exists, change ID right now!!!");
+      }
+      window.location.reload();
+    }
+  })
+  
+  
+})
+
+
+</script>
+
+</body>
+</html>

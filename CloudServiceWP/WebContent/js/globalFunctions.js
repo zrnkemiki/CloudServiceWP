@@ -13,24 +13,27 @@ function printNav(page) {
 			loggedType = logged.userType;
 			console.log(loggedType);
 			if (loggedType == "SUPERADMIN") {
-				if (page == "index.html" || page == "user-edit.html"|| page == "users-view.html" || page == "organizations-view.html") {
+				if (page == "index.html" || page == "user-edit.html"|| page == "users-view.html" || page == "organizations-view.html" || page == "vms-view.html") {
 					navItems += '<li><a href="my-profile.html">My Profile</a></li>';
 					navItems += '<li><a href="users-view.html">View users</a></li>';
 					navItems += '<li><a href="organizations-view.html">View organizations</a></li>';
+					navItems += '<li><a href="vms-view.html">View Virtual machines</a></li>';
 					$("#myNavbarList").append(navItems);
 				}
 			}
 			else if (loggedType == "ADMIN" ) {
-				if (page == "index.html" || page == "user-edit.html"|| page == "users-view.html" || page == "organizations-view.html") {
+				if (page == "index.html" || page == "user-edit.html"|| page == "users-view.html" || page == "organizations-view.html" || page == "vms-view.html") {
 					navItems += '<li><a href="my-profile.html">My Profile</a></li>';
 					navItems += '<li><a href="users-view.html">View users</a></li>';
 					navItems += '<li><a href="organization-edit.html?id=' + logged.organization.id + '">My organization</a></li>';
+					navItems += '<li><a href="vms-view.html">View Virtual machines</a></li>';
 					$("#myNavbarList").append(navItems);
 				}
 			}
 			else if (loggedType == "USER" ) {
-				if (page == "index.html" || page == "my-profile.html") {
+				if (page == "index.html" || page == "my-profile.html"  || page == "vms-view.html") {
 					navItems += '<li><a href="my-profile.html">My Profile</a></li>';
+					navItems += '<li><a href="vms-view.html">View Virtual machines</a></li>';
 					$("#myNavbarList").append(navItems);
 				}
 			}

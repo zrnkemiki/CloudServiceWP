@@ -92,8 +92,6 @@ public class OrganizationService {
 	public static Organization getOrganizationByID(int id, ServletContext ctx) {
 		Organizations organizations = getOrganizations(ctx);
 		Organization newOrg = null;
-		System.out.println("Ovo je id = " + id);
-		System.out.println("Ovo su sve vrednosti= " + organizations.getOrganizations().keySet());
 		Collection<Organization> org = organizations.getOrganizations().values();
 		for (Organization organization : org) {
 			if (organization.getId() == id) {

@@ -1,5 +1,6 @@
 package controller;
 
+import java.io.InputStream;
 import java.util.Collection;
 
 import javax.servlet.ServletContext;
@@ -15,10 +16,15 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
+
 import dto.CredentialsDTO;
+import dto.OrganizationDTO;
 import dto.UserDTO;
 import enums.UserType;
 import model.User;
+import service.OrganizationService;
 import service.UserService;
 
 @Path("/")
@@ -105,5 +111,33 @@ public class UserController {
 		UserService.deleteUser(email, request, ctx);
 		return Response.status(Response.Status.OK).build();
 	}
+	
+	
+	@POST
+	@Path("/uploadImage/{pictureName}/{option}")
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	public Response uploadImage(@FormDataParam("pictureFile") InputStream uploadedInputStream,
+								@FormDataParam("pictureFile") FormDataContentDisposition fileDetail,
+								@PathParam("pictureName") String pictureName,
+								@PathParam("option") int option) {
+		
+		boolean saved = UserService.saveImageToDiskRegister(uploadedInputStream, fileDetail, pictureName, ctx, option);
+		if (saved) {
+			return Response.ok().build();
+		}
+		return Response.status(Response.Status.CONFLICT).build();
+		
+	}
+	
+
+	@POST
+	@Path("/user/add")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response addUser(UserDTO dto) {
+		System.out.println("Usao u add user" + dto.getEmail());
+		return UserService.addUser(dto, request, ctx);
+	}
+
 
 }

@@ -2,6 +2,8 @@ package model;
 
 import java.util.List;
 
+import dto.VirtualMachineDTO;
+
 public class VirtualMachine {
 
 	private int id;
@@ -32,6 +34,7 @@ public class VirtualMachine {
 		this.disks = disks;
 		this.activities = activities;
 	}
+
 
 	public int getId() {
 		return id;

@@ -33,9 +33,9 @@
 </nav>
 
 <div class="container">
-  <h2>CloudServiceWP</h2>
-  <p>All users</p>            
+  <h2>CloudServiceWP</h2>        
   <table class="table table-striped">
+  	<button class="btn btn-success" onclick="addUser()">Add new user</button>
     <thead>
       <tr>
         <th>Firstname</th>
@@ -100,6 +100,10 @@
       }
     })
 
+  }
+
+	function addUser() {
+	window.location.replace("add-user.html");
   }
 
   function editUser(userEmail) {
