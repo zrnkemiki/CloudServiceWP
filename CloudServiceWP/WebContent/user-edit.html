@@ -111,6 +111,7 @@ $(function() {
     dataType: "json",
     success: function(user) {
       $("#email-edit").val(user.email);
+      $("#email-edit").prop('disabled', true);
       $("#password-edit").val(user.password);
       $("#first-name-edit").val(user.firstName);
       $("#last-name-edit").val(user.lastName);
