@@ -1,8 +1,7 @@
 package dto;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import model.Disk;
 
 public class VirtualMachineDTO {
 
@@ -13,7 +12,6 @@ public class VirtualMachineDTO {
 
 	public VirtualMachineDTO() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	public String getName() {

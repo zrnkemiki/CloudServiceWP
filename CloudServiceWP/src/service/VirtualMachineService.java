@@ -114,7 +114,7 @@ public class VirtualMachineService {
 		vm.setNumberOfCores(vm.getCategory().getNumberOfCores());
 		vm.setNumberOfGpuCores(vm.getCategory().getNumberOfGpuCores());
 		vm.setRam(vm.getCategory().getRam());
-		vms.getVms().put(vm.getId(), vm);
+		
 		
 		if(!dto.getDisks().isEmpty()) {
 			for (Integer i : dto.getDisks()) {
@@ -122,6 +122,8 @@ public class VirtualMachineService {
 			}
 		}
 
+		vms.getVms().put(vm.getId(), vm);
+		
 		saveVirtualMachines(ctx, vms);
 		return Response.status(Response.Status.CREATED).build();
 		

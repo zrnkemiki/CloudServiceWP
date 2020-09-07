@@ -1,8 +1,7 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import dto.VirtualMachineDTO;
 
 public class VirtualMachine {
 
@@ -18,7 +17,8 @@ public class VirtualMachine {
 
 	public VirtualMachine() {
 		super();
-		// TODO Auto-generated constructor stub
+		disks = new ArrayList<Disk>();
+		activities = new ArrayList<Activity>();
 	}
 
 	public VirtualMachine(int id, String name, Organization organization, CategoryVM category, int numberOfCores,

@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="css/authentication.css">
   <link rel="stylesheet" href="css/style.css">
 
+
 </head>
 <body>
 
@@ -34,8 +35,8 @@
 
 <div class="container">
   <h2>CloudServiceWP</h2>
-  <p>All vms</p>            
-  <table class="table table-striped">
+  <input class="search-input" type="text" id="search-box" onkeyup="search()" placeholder="Search.." title="Type in a name">           
+  <table class="table table-striped" id="main-table">
   	<button class="btn btn-success" onclick="addVm()">Add new disk</button>
     <thead>
       <tr>
@@ -154,6 +155,7 @@ var vmsList = [];
   function addVm() {
 	window.location.replace("add-disk.html");
   }
+
 
   </script>
 
