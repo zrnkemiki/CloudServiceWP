@@ -126,5 +126,116 @@ function search() {
 	}
 
 
+function filter() {
+	var min_core_filter, max_core_filter, min_ram_filter, max_ram_filter, min_gpu_filter, max_gpu_filter;
+	var table, tr, td_core, td_ram, td_gpu, i;
+	min_core_filter = document.getElementById("min-cores").value;
+	max_core_filter = document.getElementById("max-cores").value;
+	min_ram_filter = document.getElementById("min-ram").value;
+	max_ram_filter = document.getElementById("max-ram").value;
+	min_gpu_filter = document.getElementById("min-gpu").value;
+	max_gpu_filter = document.getElementById("max-gpu").value;
+	table = document.getElementById("main-table");
+	tr = table.getElementsByTagName("tr");
+	for (i = 1; i < tr.length; i++) {
+		td_c = tr[i].getElementsByTagName("td")[2];
+		td_core = td_c.textContent || td_c.innerText;
+		td_core = Number(td_core);
+		td_r = tr[i].getElementsByTagName("td")[3];
+		td_ram = td_r.textContent || td_r.innerText;
+		td_ram = Number(td_ram);
+		td_g = tr[i].getElementsByTagName("td")[4];
+		td_gpu = td_g.textContent || td_g.innerText;
+		td_gpu = Number(td_gpu);
+		
+		// nema filtera
+		if (min_core_filter == "" && max_core_filter == "" &&
+				min_ram_filter == "" && max_ram_filter == "" &&
+				min_gpu_filter == "" && max_gpu_filter == "") {
+			tr[i].style.display ="";
+			return;
+		}
+		
+		if (min_core_filter != "" || max_core_filter != "") {
+			// postavljen samo MAX CORE filter
+			if (min_core_filter == "") {
+				if (td_core <= Number(max_core_filter)) {
+					tr[i].style.display = "";
+				} else {
+					tr[i].style.display = "none";
+				}
+			// postavljen samo MIN CORE filter
+			} else if (max_core_filter == ""){
+				if (td_core >= Number(min_core_filter)) {
+					tr[i].style.display = "";
+				} else {
+					tr[i].style.display = "none";
+				}
+			// postavljeni i MIN i MAX
+			} else {
+				if (td_core >= Number(min_core_filter) && td_core <= Number(max_core_filter)) {
+					tr[i].style.display = "";
+				} else {
+					tr[i].style.display = "none";
+				}
+			}
+		}
+		
+		if (min_ram_filter != "" || max_ram_filter != "") {
+			// postavljen samo MAX RAM filter
+			if (min_ram_filter == "") {
+				if (td_ram <= Number(max_ram_filter)) {
+					tr[i].style.display = "";
+				} else {
+					tr[i].style.display = "none";
+				}
+			// postavljen samo MIN RAM filter
+			} else if (max_ram_filter == "") {
+				if (td_ram >= Number(min_ram_filter)) {
+					tr[i].style.display = "";
+				} else {
+					tr[i].style.display = "none";
+				}
+			// postavljena oba filtera
+			} else {
+				if (td_ram >= Number(min_ram_filter) && td_ram <= Number(max_ram_filter)) {
+					tr[i].style.display = "";
+				} else {
+					tr[i].style.display = "none";
+				}
+			}
+		}
+		
+		if (min_gpu_filter != "" || max_gpu_filter != "")  {
+			// postavljen samo MAX GPU filter
+			if (min_gpu_filter == "") {
+				if (td_gpu <= Number(max_gpu_filter)) {
+					tr[i].style.display = "";
+				} else {
+					tr[i].style.display = "none";
+				}
+			// postavljen samo MIN GPU filter
+			} else if (max_gpu_filter == "") {
+				if (td_gpu >= Number(min_gpu_filter)) {
+					tr[i].style.display = "";
+				} else {
+					tr[i].style.display = "none";
+				}
+			// postavljena oba filtera
+			} else {
+				if (td_gpu >= Number(min_gpu_filter) && td_gpu <= Number(max_gpu_filter)) {
+					tr[i].style.display = "";
+				} else {
+					tr[i].style.display = "none";
+				}
+			}			
+		}
+		
+	}
+	
+	
+}
+
+
 
 

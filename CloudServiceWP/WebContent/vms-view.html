@@ -34,7 +34,74 @@
 
 <div class="container">
   <h2>CloudServiceWP</h2>
-  <input class="search-input" type="text" id="search-box" onkeyup="search()" placeholder="Search.." title="Type in a name">         
+  <input class="search-input" type="text" id="search-box" onkeyup="search()" placeholder="Search.." title="Type in a name">
+    <button type="button" name="filter-btn" id="filter-btn" tabindex="4" class="form-control btn btn-primary" data-toggle="collapse" data-target="#filter-panel"><span class="glyphicon glyphicon-cog"></span> FILTERS
+    </button> <hr>
+   
+      <div class="row">
+        <div class="col-sm-8 text-left">
+            <div class="container">
+                <div class="row">
+                <div class="col-md-6 col-md-offset-3">
+                <div id="filter-panel" class="collapse filter-panel">
+                    <div class="panel panel-login">
+                        <div class="panel-heading">
+                            <h3>Filters</h3>
+                            <hr>
+                        </div>
+                        <div class="panel-body">
+                            <form class="form" role="form" id="filter-form">
+                                <div class="form-group">
+                                    <div class="col-md-5 col-md-offset-1">
+                                        <label>Min</label>
+                                        <div class="form-group">
+                                          <input type="number" name="min-cores" id="min-cores" tabindex="1" class="form-control" onkeyup="filter()" placeholder="Min cores" value="">
+                                        </div>
+                                        <div class="form-group">
+                                          <input type="number" name="min-ram" id="min-ram" tabindex="1" class="form-control" onkeyup="filter()" placeholder="Min ram" value="">
+                                        </div>
+                                        <div class="form-group">
+                                          <input type="number" name="min-gpu" id="min-gpu" tabindex="1" class="form-control" onkeyup="filter()" placeholder="Min gpu" value="">
+                                        </div>                                        
+                                  </div>
+                                    <div class="col-md-4 col-md-offset-2">
+                                        <label>Max</label>
+                                        <div class="form-group">
+                                          <input type="number" name="max-cores" id="max-cores" tabindex="1" class="form-control" onkeyup="filter()" placeholder="Max cores" value="">
+                                        </div>
+                                        <div class="form-group">
+                                          <input type="number" name="max-ram" id="max-ram" tabindex="1" class="form-control" onkeyup="filter()" placeholder="Max ram" value="">
+                                        </div>
+                                        <div class="form-group">
+                                          <input type="number" name="max-gpu" id="max-gpu" tabindex="1" class="form-control" onkeyup="filter()" placeholder="Max gpu" value="">
+                                        </div>                                         
+                                    </div>
+                                
+                                </div> <!-- form group [rows] -->
+                                  <div class="form-group">
+                                    <div class="row">
+                                      <div class="col-sm-6 col-sm-offset-3">
+                                        <input type="button" title="Apply only filter" name="filter-submit-btn" id="filter-submit-btn" tabindex="4" class="form-control btn btn-primary" value="FILTER">
+                                      </div>
+                                  </div>
+                                  <br>
+                                  </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>    
+            </div>
+
+        </div>
+    </div>
+    </div>
+    </div>
+
+
+
+
+
   <table class="table table-striped" id="main-table">
   	<button class="btn btn-success" onclick="addVm()">Add new virtual machine</button>
     <thead>
