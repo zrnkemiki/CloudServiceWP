@@ -1,1 +1,1 @@
-{"categories":{"0":{"id":0,"name":"Kategorija 1","numberOfCores":8,"numberOfGpuCores":4,"ram":2},"1":{"id":1,"name":"Kategorija 2","numberOfCores":16,"numberOfGpuCores":4,"ram":64},"2":{"id":2,"name":"Kategorija 3","numberOfCores":10,"numberOfGpuCores":8,"ram":16}}}
+{"categories":{"0":{"id":0,"name":"Category 1","numberOfCores":8,"numberOfGpuCores":4,"ram":2},"1":{"id":1,"name":"Category 2","numberOfCores":16,"numberOfGpuCores":4,"ram":64},"2":{"id":2,"name":"Category 3","numberOfCores":10,"numberOfGpuCores":8,"ram":16}}}

@@ -108,8 +108,7 @@ public class UserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response deleteUser(@PathParam("email") String email) {
-		UserService.deleteUser(email, request, ctx);
-		return Response.status(Response.Status.OK).build();
+		return UserService.deleteUser(email, request, ctx);
 	}
 	
 	

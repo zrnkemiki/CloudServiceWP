@@ -1,4 +1,6 @@
 /controller/
-/service/
-/model/
+/dto.class
 /dto/
+/enums/
+/model/
+/service/

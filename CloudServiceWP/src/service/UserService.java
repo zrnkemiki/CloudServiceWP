@@ -72,7 +72,7 @@ public class UserService {
 	public static Response deleteUser(String email, HttpServletRequest request, ServletContext ctx) {
 		User logged = (User) request.getSession().getAttribute("loggedUser");
 		if (logged.getEmail().equalsIgnoreCase(email)) {
-			return Response.status(Response.Status.FORBIDDEN).build();
+			return Response.status(Response.Status.BAD_REQUEST).build();
 		} 
 		else {
 			Users allUsers = getUsers(ctx);

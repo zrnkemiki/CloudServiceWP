@@ -219,6 +219,7 @@ public class VirtualMachineService {
 				i.remove();
 			}
 		saveVirtualMachines(ctx, vms);
+		System.out.println("VMS Updated");
 		}
 		
 	}

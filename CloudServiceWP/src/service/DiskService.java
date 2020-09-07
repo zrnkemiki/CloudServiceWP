@@ -173,9 +173,12 @@ public class DiskService {
 
 	public static Response deleteDisk(int diskId, ServletContext ctx, HttpServletRequest request) {
 		Disks disks = getDisks(ctx);
-		int vmId = getDiskByID(diskId, ctx).getVmId();
+		Disk disk = getDiskByID(diskId, ctx);
+		int vmId = disk.getVmId();
 		disks.getDisks().remove(String.valueOf(diskId));
-		VirtualMachineService.removeDiskFromMachine(vmId, diskId, ctx);
+		if(vmId != -1) {
+			VirtualMachineService.removeDiskFromMachine(vmId, diskId, ctx);
+		}
 		return Response.status(Response.Status.OK).build();
 	}
 	
