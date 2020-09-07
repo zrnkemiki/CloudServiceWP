@@ -247,7 +247,6 @@ function deleteActivity(activityId) {
        $.ajax({
       type: "DELETE",
       url: "rest/activity/" + activityId + "/delete",
-      dataType: "json", 
       success: function() {
         alert("Activity with id: " + activityId + " deleted successfully!")
       	window.location.replace("vms-view.html");
