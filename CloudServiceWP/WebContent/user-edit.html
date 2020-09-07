@@ -23,7 +23,7 @@
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
-        <li class="active"><a href="user-edit.html">User edit</a></li>
+        <li class="active"><a href="user-edit.html">User</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><a onclick="logout()" id="logout-btn"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
@@ -40,7 +40,7 @@
       <div class="col-md-6 col-md-offset-3">
         <div class="panel panel-login">
           <div class="panel-heading">
-            <h3>My Profile</h3>
+            <h3>User Profile</h3>
             <hr>
           </div>
           <div class="panel-body">
@@ -102,6 +102,7 @@ $(function() {
 var userEmail = "";
 
 $(function() {
+  restrict()
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
   userEmail = urlParams.get('email')
@@ -135,36 +136,36 @@ $("#edit-submit").click(function() {
   var firstName = $("#first-name-edit").val();
   var lastName = $("#last-name-edit").val();
   var phone = $("#phone-edit").val();
-  if (email == "" || password == "" || firstName == "" || lastName == "" || email == "") {
+
+
+  if(password == ""){
+     $("#password-edit").css('border', '1px solid red').css('background', 'pink');
+  }
+  if(password2 == ""){
+     $("#password2-edit").css('border', '1px solid red').css('background', 'pink');
+  }
+  if(firstName == ""){
+     $("#first-name-edit").css('border', '1px solid red').css('background', 'pink');
+  }
+  if(lastName == ""){
+     $("#last-name-edit").css('border', '1px solid red').css('background', 'pink');
+  }
+
+
+
+  if (email == "" || password == "" || firstName == "" || lastName == "") {
       alert("Please fill in the entire form!");
       return;
   }
   
-  // ovo je za sliku, nece trebati
-  //var imgName = $("#image-thumb").attr('src');
-  
-  //if ($("#pictureFile")[0].files.length == 0) {
-  //  // nista - ostaje ista slika
-  //} else {
-  //  imgName = username;
-  //  uploadPhoto(imgName);
-  //}
+
   
   editedUser.email = email;
   editedUser.password = password;
   editedUser.firstName = firstName;
   editedUser.lastName = lastName;
 
-  /*
-  if ($("#pictureFile")[0].files.length == 0) {
-    var imgpath = $("#image-thumb").attr('src');
-    var i = imgpath.split("/")[1];
-    editedUser.picture = i;
-  } else {
-    editedUser.picture = username + ".jpg";
-  }
-  */
-  
+
   
   $.ajax({
     type: "POST",

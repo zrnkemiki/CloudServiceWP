@@ -54,6 +54,9 @@
                     <input type="password" name="password-edit" id="password-edit" tabindex="1" class="form-control" placeholder="Password">
                   </div>
                   <div class="form-group">
+                    <input type="password" name="password2-edit" id="password2-edit" tabindex="1" class="form-control" placeholder="Repeat password">
+                  </div>
+                  <div class="form-group">
                     <input type="text" name="first-name-edit" id="first-name-edit" tabindex="1" class="form-control" placeholder="First Name" value="">
                   </div>
                   <div class="form-group">
@@ -96,13 +99,9 @@
 var loggedUserID = -1;
 var loggedUserEmail = "";
 
-$(function() {
-    //restrict();
-});
-
-
 
 $(function() {
+  restrict()
   $.ajax({
     type: "POST",
     url: "rest/user/logged",
@@ -131,39 +130,46 @@ $("#edit-submit").click(function() {
   var editedUser = {};
   var email = $("#email-edit").val();
   var password = $("#password-edit").val();
+  var password2 = $("#password2-edit").val();
   var firstName = $("#first-name-edit").val();
   var lastName = $("#last-name-edit").val();
   var phone = $("#phone-edit").val();
-  if (email == "" || password == "" || firstName == "" || lastName == "" || email == "") {
+    if(email == ""){
+     $("#email-edit").css('border', '1px solid red').css('background', 'pink');
+  }
+  if(password == ""){
+     $("#password-edit").css('border', '1px solid red').css('background', 'pink');
+  }
+  if(password2 == ""){
+     $("#password2-edit").css('border', '1px solid red').css('background', 'pink');
+  }
+  if(firstName == ""){
+     $("#first-name-edit").css('border', '1px solid red').css('background', 'pink');
+  }
+  if(lastName == ""){
+     $("#last-name-edit").css('border', '1px solid red').css('background', 'pink');
+  }
+  if(phone == ""){
+     $("#phone-edit").css('border', '1px solid red').css('background', 'pink');
+  }
+
+
+  if (email == "" || password == "" | password2 == "" || firstName == "" || lastName == "" || email == "" || userType =="" || organizationId == "") {
       alert("Please fill in the entire form!");
       return;
   }
   
-  // ovo je za sliku, nece trebati
-  //var imgName = $("#image-thumb").attr('src');
-  
-  //if ($("#pictureFile")[0].files.length == 0) {
-  //  // nista - ostaje ista slika
-  //} else {
-  //  imgName = username;
-  //  uploadPhoto(imgName);
-  //}
-  
+  else if (password != password2) {
+      alert("Passwords don't match!");
+      return;
+  }
+
   editedUser.email = email;
   editedUser.password = password;
   editedUser.firstName = firstName;
   editedUser.lastName = lastName;
 
-  /*
-  if ($("#pictureFile")[0].files.length == 0) {
-    var imgpath = $("#image-thumb").attr('src');
-    var i = imgpath.split("/")[1];
-    editedUser.picture = i;
-  } else {
-    editedUser.picture = username + ".jpg";
-  }
-  */
-  
+
   
   $.ajax({
     type: "POST",

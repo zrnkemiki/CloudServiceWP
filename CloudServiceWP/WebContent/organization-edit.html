@@ -83,13 +83,10 @@
   
 
 
-$(function() {
-    //restrict();
-});
-
 var organizationId = "";
 
 $(function() {
+  restrict()
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
   organizationId = urlParams.get('id')
@@ -115,7 +112,14 @@ $("#edit-submit").click(function() {
   var editedOrganization = {};
   var name = $("#name-edit").val();
   var about = $("#about-edit").val();
-  console.log(editedOrganization);
+
+  if(name == ""){
+     $("#name-edit").css('border', '1px solid red').css('background', 'pink');
+  }
+  if(about == ""){
+     $("#about-edit").css('border', '1px solid red').css('background', 'pink');
+  }
+  
   if (name == "" || about == "") {
       alert("Please fill in the entire form!");
       return;

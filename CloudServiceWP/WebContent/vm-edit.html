@@ -55,7 +55,7 @@
                   </div>
                   <div class="form-group">
                     <form>
-					   <label>Izaberite kategoriju:</label>
+					   <label>Choose category:</label>
 					  	<select name="type" id="category-list" onchange="setCategoryValues(value)">
 					  </label>
 					</form>
@@ -138,8 +138,11 @@
 }
   
 
+  
+
 
 $(function() {
+    restrict()
 	
 
     $.ajax({
@@ -263,8 +266,12 @@ $("#edit-submit").click(function() {
   var editedVM = {};
   var name = $("#name-edit").val();
   var category = $("#category-list").val()
-  console.log(category);
-  debugger;
+  
+
+  if(name == ""){
+     $("#name-edit").css('border', '1px solid red').css('background', 'pink');
+  }
+
   if (name == "" ) {
       alert("Please fill in the entire form!");
       return;
@@ -287,14 +294,11 @@ $("#edit-submit").click(function() {
       window.location.replace("vms-view.html");
     },
     error: function(response, xhr) {
-      console.log("usao u error????");
       if (xhr == 400) {
         alert("Please fill in the entire form correctly!");
       } else if (xhr == 404) {
-        alert("Sorry! User has not been found in the system");
-      } else if (xhr == 409) {
-        alert("editedVM with selected ID exists, change ID right now!!!");
-      }
+        alert("Sorry! Virtual machine has not been found in the system");
+      } 
       window.location.reload();
     }
   })

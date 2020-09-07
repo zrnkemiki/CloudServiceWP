@@ -123,6 +123,8 @@
 
  $(function() {
 
+  restrict();
+
  	var loggedType = "";
 	$.ajax({
 		type: "POST",
@@ -147,10 +149,8 @@
       dataType: "json",
       success: function(vms) {
         var panels = "";
-        console.log("Ovo su organizacije: " + JSON.stringify(vms));
         $.each(vms, function(i, vm) {
           var panel = "";
-          console.log("Ovo je vm: " + JSON.stringify(vm));
           panel += '<tr>'
           panel += '<td>' + vm.name + '</td>';
           panel += '<td>' + vm.organization.name + '</td>';

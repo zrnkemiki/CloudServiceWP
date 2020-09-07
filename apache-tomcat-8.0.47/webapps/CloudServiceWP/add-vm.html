@@ -121,7 +121,7 @@ function setCategoryValues(id){
 var categoriesList = [];
 
 $(function() {
-	
+	 restrict();
 
     $.ajax({
       type: "GET",
@@ -212,10 +212,10 @@ $("#edit-submit").click(function() {
   var organization = $("#organization-list").val()
   var disks = $("#disk-list").val();
 
-  console.log("Ovo su diskovi selektovani" + disks);
+  if(name == ""){
+     $("#name-edit").css('border', '1px solid red').css('background', 'pink');
+  }
  
-  console.log(category);
-  debugger;
   if (name == "" ) {
       alert("Please fill in the entire form!");
       return;

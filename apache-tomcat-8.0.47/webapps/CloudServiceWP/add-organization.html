@@ -84,7 +84,7 @@
 
 
 $(function() {
-    //restrict();
+    restrict();
 });
 
 
@@ -92,6 +92,14 @@ $("#edit-submit").click(function() {
   var newOrganization = {};
   var name = $("#name-edit").val();
   var about = $("#about-edit").val();
+
+  if(name == ""){
+     $("#name-edit").css('border', '1px solid red').css('background', 'pink');
+  }
+  if(about == ""){
+     $("#about-edit").css('border', '1px solid red').css('background', 'pink');
+  }
+
   if (name == "" || about == "" ) {
       alert("Please fill in the entire form!");
       return;

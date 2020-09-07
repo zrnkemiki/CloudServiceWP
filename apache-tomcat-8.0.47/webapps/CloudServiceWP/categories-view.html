@@ -54,7 +54,7 @@
 
 
  $(function() {
-
+  restrict();
  	var loggedType = "";
 	$.ajax({
 		type: "POST",
@@ -79,10 +79,8 @@
       dataType: "json",
       success: function(categories) {
         var panels = "";
-        console.log("Ovo su kategorije: " + JSON.stringify(categories));
         $.each(categories, function(i, category) {
           var panel = "";
-          console.log("Ovo je vm: " + JSON.stringify(category));
           panel += '<tr>'
           panel += '<td>' + category.name + '</td>';
           panel += '<td>' + category.numberOfCores + '</td>';
