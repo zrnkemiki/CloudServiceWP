@@ -301,7 +301,7 @@ function filter() {
 				&& min_ram_filter == "" && max_ram_filter == ""
 				&& min_gpu_filter == "" && max_gpu_filter == "") {
 			tr[i].style.display = "";
-			return;
+			continue;
 		}
 
 		if (min_core_filter != "" || max_core_filter != "") {
