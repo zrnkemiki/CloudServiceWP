@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Disk profile</title>
+	<meta charset="ISO-8859-1">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="js/globalFunctions.js"></script>
+  <script type="text/javascript" src="js/index.js"></script>
+
+  <link rel="stylesheet" href="css/authentication.css">
+  <link rel="stylesheet" href="css/style.css">
+
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="index.html">Home</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="user-edit.html">Disk edit</a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a onclick="logout()" id="logout-btn"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid text-center">    
+  <div class="row content">
+    <div class="col-sm-8 text-left"> 
+      <div class="container">
+      <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        <div class="panel panel-login">
+          <div class="panel-heading">
+            <h3>Disk</h3>
+            <hr>
+          </div>
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-lg-12">
+                <form role="form" style="display: block;">
+                  <div class="form-group">
+                    <input type="text" name="name-edit" id="name-edit" tabindex="1" class="form-control" placeholder="Name" value="">
+                  </div>
+                  <div class="form-group">
+                     
+                        <label>Choose disk capacity:</label>
+                          <select name="type" id="capacity-edit">
+                            <option value="1">1 TB</option>
+                            <option value="2">2 TB</option>
+                            <option value="4">4 TB</option>
+                            <option value="6">6 TB</option>
+                          </select>
+                      
+                  </div>
+                  <div class="form-group">
+                    
+          					   <label>Choose virtual machine:</label>
+          					  	<select name="type" id="vms-list">
+                        </select>
+          					
+                  </div>
+                  <div>
+                    <form>
+                        <label>Choose disk type:</label>
+                          <select name="type" id="disk-type">
+                            <option value="1">HDD</option>
+                            <option value="2">SSD</option>
+                          </select>
+                      </form>
+                  </div>
+                  <div class="form-group">
+                    <div class="row">
+                       <div class="col-sm-6 col-sm-offset-3">
+                        <input type="button" name="edit-submit" id="edit-submit" tabindex="4" class="form-control btn btn-register" value="ADD Disk">
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>      
+      
+      <hr>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  
+
+
+var vmsList = [];
+var organizationList = [];
+
+$(function() {
+
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+  diskId = urlParams.get('id')
+  console.log("Ovo je id diska"+ diskId);
+  $.ajax({
+    type: "GET",
+    url: "rest/disk/"+ diskId,
+    dataType: "json",
+    success: function(disk) {
+      $("#name-edit").val(disk.name);
+      $("#capacity-edit").val(disk.capacity);
+      if(disk.diskType == "HDD"){
+        $("#disk-type").val(1);
+      }
+      else if(disk.diskType == "SSD"){
+        $("#disk-type").val(2);
+      }
+      $("#vms-list").val(disk.vmId);
+    },
+    error: function(response) {
+      
+    }
+  })
+
+  var loggedType = "";
+  $.ajax({
+    type: "POST",
+    url: "rest/user/logged",
+    dataType: "json",
+    success: function(logged) {
+      loggedType = logged.userType;
+    },
+    error: function(response, xhr) {
+        alert("You are not logged in added!");
+        window.location.replace("authentication.html");
+        var logbar = '<li><a href="authentication.html"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>';
+      $("#log-bar").append(logbar);
+    }
+  })
+
+	 $("#vms-list").empty();
+
+    $.ajax({
+      type: "GET",
+      url: "rest/vms/all",
+      dataType: "json",
+      success: function(vms) {
+        var panels = "";
+       	console.log("Ovo su vms" + vms);
+          var panel = "";
+          panel += '<option value=' + -1 + '>' + 'NO VM' + '</option>';
+        $.each(vms, function(i, vm) {
+          panel += '<option value=' + vm.id + '>' + vm.name + '</option>';
+          panels += panel;
+          panel = "";
+        });
+        vmsList = vms;
+        $("#vms-list").append(panels);
+      },
+      error: function(response) {
+        alert("Something went wrong while getting vms!");
+      }
+    })
+
+  
+
+
+
+});
+
+$("#edit-submit").click(function() {
+  var newDisk = {};
+  var name = $("#name-edit").val();
+  var vmId = $("#vms-list").val();
+  var capacity = $("#capacity-edit").val()
+  var organizationId = $("#organization-list").val()
+  var diskType = $("#disk-type").val()
+ 
+  debugger;
+  if (name == "" || organizationId == "" || diskType == "") {
+      alert("Please fill in the entire form!");
+      return;
+  }
+  
+
+  
+  newDisk.name = name;
+  newDisk.vmId =vmId;
+  newDisk.capacity = capacity;
+  newDisk.organizationId = organizationId;
+  newDisk.diskType = diskType;
+
+  
+  $.ajax({
+    type: "POST",
+    url: "rest/disk/add",
+    contentType: "application/json",
+    data: JSON.stringify(newDisk),
+    success: function(response) {
+      alert("Disk added!");
+      window.location.replace("disks-view.html");
+    },
+    error: function(response, xhr) {
+      console.log("usao u error????");
+      if (xhr == 400) {
+        alert("Please fill in the entire form correctly!");
+      } else if (xhr == 404) {
+        alert("Sorry! Not been found in the system");
+      } else if (xhr == 409) {
+        alert("Disk with selected ID exists, change ID right now!!!");
+      }
+      window.location.reload();
+    }
+  })
+  
+  
+})
+
+
+</script>
+
+</body>
+</html>

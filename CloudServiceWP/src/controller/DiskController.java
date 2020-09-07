@@ -61,13 +61,14 @@ public class DiskController {
 	@GET
 	@Path("/disk/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getVMByID(@PathParam("id") int id) {
+	public Response getDiskById(@PathParam("id") int id) {
 		User logged = (User) request.getSession().getAttribute("loggedUser");
 		if (logged == null) {
 			return Response.status(Response.Status.FORBIDDEN).build();
 		}
-		VirtualMachine vm = VirtualMachineService.getVirtualMachineByID(id, ctx);
-		return Response.status(Response.Status.OK).entity(vm).build();
+		Disk disk = DiskService.getDiskByID(id, ctx);
+		System.out.println("Usao u get disk by id controller");
+		return Response.status(Response.Status.OK).entity(disk).build();
 
 	}
 	
@@ -75,8 +76,8 @@ public class DiskController {
 	@Path("/disk/{id}/edit")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response editVM(VirtualMachineDTO dto, @PathParam("id") int id) {
-		System.out.println("Usao u VM controller");
+	public Response diskEdit(VirtualMachineDTO dto, @PathParam("id") int id) {
+		System.out.println("Usao u Disk edit controller");
 		return VirtualMachineService.editVirtualMachine(dto, id, request, ctx);
 	}
 	
