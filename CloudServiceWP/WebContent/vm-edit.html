@@ -54,11 +54,9 @@
                     <input type="text" name="organization-edit" id="organization-edit" tabindex="1" class="form-control" placeholder="organization">
                   </div>
                   <div class="form-group">
-                    <form>
 					   <label>Choose category:</label>
 					  	<select name="type" id="category-list" onchange="setCategoryValues(value)">
 					  </label>
-					</form>
                   </div>
                   <div class="form-group">
                     <input type="text" name="cores-edit" id="cores-edit" tabindex="1" class="form-control" placeholder="cores" value="">
@@ -239,7 +237,7 @@ $(function() {
           }
           
           if(loggedType == "SUPERADMIN"){
-          	 panel += '<td><button class="btn btn-danger" onclick="deleteActivity(&quot;' + activity.id + '&quot;)">DELETE</button></td>';
+          	 panel += '<td><input type="button" class="btn btn-danger" value="DELETE" onclick="deleteActivity(&quot;' + activity.id + '&quot;)"></td>';
           }
          
           panel += '</tr>'
@@ -313,7 +311,7 @@ function deleteActivity(activityId) {
         if (xhr.status == 404) {
           alert("Disk that you want to delete cannot be found!");
         }
-        alert("Something went wrong while deleting Disk!");
+        alert("Something went wrong while deleting Activity!");
         window.location.replace("disks-view.html");
       }
     })
