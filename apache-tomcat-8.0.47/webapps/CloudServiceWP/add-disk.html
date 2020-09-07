@@ -23,7 +23,7 @@
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
-        <li class="active"><a href="user-edit.html">VM add</a></li>
+        <li class="active"><a href="user-edit.html">Disk add</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><a onclick="logout()" id="logout-btn"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
@@ -142,7 +142,7 @@ $(function() {
         var panels = "";
        	console.log("Ovo su vms" + vms);
           var panel = "";
-          panel += '<option value=' + 0 + '>' + 'NO VM' + '</option>';
+          panel += '<option value=' + -1 + '>' + 'NO VM' + '</option>';
         $.each(vms, function(i, vm) {
           panel += '<option value=' + vm.id + '>' + vm.name + '</option>';
           panels += panel;

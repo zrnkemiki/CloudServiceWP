@@ -9,7 +9,7 @@ public class VirtualMachineDTO {
 	private String name;
 	private int categoryId;
 	private int organizationId;
-	private List<Disk> disks;
+	private List<Integer> disks;
 
 	public VirtualMachineDTO() {
 		super();
@@ -20,7 +20,9 @@ public class VirtualMachineDTO {
 		return name;
 	}
 
-	public VirtualMachineDTO(String name, int categoryId, int organizationId, List<Disk> disks) {
+	
+
+	public VirtualMachineDTO(String name, int categoryId, int organizationId, List<Integer> disks) {
 		super();
 		this.name = name;
 		this.categoryId = categoryId;
@@ -48,12 +50,14 @@ public class VirtualMachineDTO {
 		this.categoryId = categoryId;
 	}
 
-	public List<Disk> getDisks() {
+	public List<Integer> getDisks() {
 		return disks;
 	}
 
-	public void setDisks(List<Disk> disks) {
+	public void setDisks(List<Integer> disks) {
 		this.disks = disks;
 	}
+
+	
 
 }

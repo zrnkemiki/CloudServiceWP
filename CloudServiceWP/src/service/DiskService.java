@@ -134,9 +134,7 @@ public class DiskService {
 		disk.setId(disks.getDisks().size() +1);
 		disk.setName(dto.getName());
 		System.out.println(dto.getVmId());
-		if(dto.getVmId() != 0) {
-			disk.setVmId(dto.getVmId());
-		}
+		
 		disk.setCapacity(dto.getCapacity());
 		disk.setOrganization(OrganizationService.getOrganizationByID(dto.getOrganizationId(), ctx));
 		if(dto.getDiskType() == 1) {
@@ -145,8 +143,16 @@ public class DiskService {
 		else {
 			disk.setDiskType(DiskType.SSD);
 		}
+		if(dto.getVmId() != -1) {
+			disk.setVmId(dto.getVmId());
+			VirtualMachineService.addDiskToMachine(disk, dto.getVmId(), ctx);
+		}
+		else {
+			disk.setVmId(-1);
+		}
 		disks.getDisks().put(disk.getId(), disk);
 		saveDisks(ctx, disks);
+		
 		return Response.status(Response.Status.CREATED).build();
 		
 
@@ -171,6 +177,29 @@ public class DiskService {
 		disks.getDisks().remove(String.valueOf(diskId));
 		VirtualMachineService.removeDiskFromMachine(vmId, diskId, ctx);
 		return Response.status(Response.Status.OK).build();
+	}
+	
+
+	public static Collection<Disk> getFreeDisks(ServletContext ctx, HttpServletRequest request) {
+		Disks disks = getDisks(ctx);
+		User logged = (User) request.getSession().getAttribute("loggedUser");
+		List<Disk> freeDisks = new ArrayList<Disk>();
+		if(logged.getUserType() == UserType.SUPERADMIN) {
+			for (Object key : disks.getDisks().keySet()) {
+				if(disks.getDisks().get(key).getVmId() == -1) {
+					freeDisks.add(disks.getDisks().get(key));
+				}
+			}
+		}
+		else if(logged.getUserType() == UserType.ADMIN) {
+			for (Object key : disks.getDisks().keySet()) {
+				if(disks.getDisks().get(key).getVmId() == -1 && disks.getDisks().get(key).getOrganization().getId() == logged.getOrganization().getId()) {
+					freeDisks.add(disks.getDisks().get(key));
+				}
+			}
+		}
+		
+		return freeDisks;
 	}
 
 

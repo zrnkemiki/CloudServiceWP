@@ -51,11 +51,10 @@
                     <input type="text" name="name-edit" id="name-edit" tabindex="1" class="form-control" placeholder="Name" value="">
                   </div>
                   <div class="form-group">
-                    <form>
-          					   <label>Izaberite kategoriju:</label>
+          					   <label>Choose category:</label>
           					  	<select name="type" id="category-list" onchange="setCategoryValues(value)">
+                        </select>
           					  </label>
-          					</form>
                   </div>
                   <div class="form-group">
                     <input type="text" name="cores-edit" id="cores-edit" tabindex="1" class="form-control" placeholder="cores" value="">
@@ -67,14 +66,16 @@
                     <input type="text" name="ram-edit" id="ram-edit" tabindex="1" class="form-control" placeholder="gpu cores" value="">
                   </div>
                    <div class="form-group">
-                  <form>
-                       <label>Izaberite organizaciju:</label>
+                       <label>Choose organization:</label>
                         <select name="type" id="organization-list">
+                          </select>
                       </label>
-                    </form>
                   </div>
-                  <div>
-                    <label>TO DO ADD DISK!</label>
+                  <div class="form-group">
+                    <label>Choose disk/s:</label>
+                        <select name="type" id="disk-list" multiple>
+                          </select>
+                      </label>
                   </div>
                   <div class="form-group">
                     <div class="row">
@@ -134,7 +135,6 @@ $(function() {
           panel += '<option value=' + category.id + '>' + category.name + '</option>';
           panels += panel;
         });
-        panels += '</select>'
         categoriesList = categories;
         $("#category-list").append(panels);
       },
@@ -155,11 +155,29 @@ $(function() {
           panel += '<option value=' + organization.id + '>' + organization.name + '</option>';
           panels += panel;
         });
-        panels += '</select>'
         $("#organization-list").append(panels);
       },
       error: function(response) {
         alert("Something went wrong while getting organizations!");
+      }
+    })
+    debugger;
+    $.ajax({
+      type: "GET",
+      url: "rest/disk/allFree",
+      dataType: "json",
+      success: function(disks) {
+        var panels = "";
+        console.log("Ovo su diskovi " + disks);
+        $.each(disks, function(i, disk) {
+          var panel = "";
+          panel += '<option value=' + disk.id + '>' + disk.name + '</option>';
+          panels += panel;
+        });
+        $("#disk-list").append(panels);
+      },
+      error: function(response) {
+        alert("Something went wrong while getting disks!");
       }
     })
 
@@ -192,6 +210,9 @@ $("#edit-submit").click(function() {
   var name = $("#name-edit").val();
   var category = $("#category-list").val()
   var organization = $("#organization-list").val()
+  var disks = $("#disk-list").val();
+
+  console.log("Ovo su diskovi selektovani" + disks);
  
   console.log(category);
   debugger;
@@ -205,6 +226,7 @@ $("#edit-submit").click(function() {
   newVM.name = name;
   newVM.categoryId =category;
   newVM.organizationId = organization;
+  newVM.disks = disks;
 
   
   $.ajax({

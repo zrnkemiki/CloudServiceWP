@@ -158,7 +158,7 @@ $("#edit-submit").click(function() {
     data: JSON.stringify(newCategory),
     success: function(response) {
       alert("Category added!");
-      window.location.replace("category-view.html");
+      window.location.replace("categories-view.html");
     },
     error: function(response, xhr) {
       if (xhr == 400) {

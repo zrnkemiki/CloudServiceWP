@@ -13,6 +13,7 @@ import java.util.List;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
+import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
@@ -114,6 +115,12 @@ public class VirtualMachineService {
 		vm.setNumberOfGpuCores(vm.getCategory().getNumberOfGpuCores());
 		vm.setRam(vm.getCategory().getRam());
 		vms.getVms().put(vm.getId(), vm);
+		
+		if(!dto.getDisks().isEmpty()) {
+			for (Integer i : dto.getDisks()) {
+				vm.getDisks().add(DiskService.getDiskByID(i, ctx));
+			}
+		}
 
 		saveVirtualMachines(ctx, vms);
 		return Response.status(Response.Status.CREATED).build();
@@ -224,6 +231,15 @@ public class VirtualMachineService {
 			}
 		}
 		return flag;
+		
+	}
+
+	public static void addDiskToMachine(Disk disk, int vmId, ServletContext ctx) {
+		VirtualMachines vms = getVirtualMachines(ctx);
+		VirtualMachine vm = getVirtualMachineByID(vmId, ctx);
+		vm.getDisks().add(disk);
+		vms.getVms().replace(vm.getId(), vm);
+		saveVirtualMachines(ctx, vms);
 		
 	}
 }

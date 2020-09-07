@@ -45,6 +45,18 @@ public class DiskController {
 		}
 		return Response.status(Response.Status.FORBIDDEN).build();
 	}
+	
+	@GET
+	@Path("/disk/allFree")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getFreeDisks() {
+		System.out.println("Usao sam u get free disks");
+		User logged = (User) request.getSession().getAttribute("loggedUser");
+		if(logged == null) {
+			return Response.status(Response.Status.FORBIDDEN).build();
+		}
+		return Response.ok(DiskService.getFreeDisks(ctx, request)).build();
+	}
 
 	@GET
 	@Path("/disk/{id}")
