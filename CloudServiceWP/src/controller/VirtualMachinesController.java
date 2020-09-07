@@ -73,7 +73,6 @@ public class VirtualMachinesController {
 	@DELETE
 	@Path("/vm/{id}/delete")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
 	public Response deleteVM(@PathParam("id") int id) {
 		return VirtualMachineService.deleteVirtualMachine(id, request, ctx);
 	}
@@ -84,6 +83,13 @@ public class VirtualMachinesController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response addVM(VirtualMachineDTO dto) {
 		return VirtualMachineService.addVirtualMachine(dto, ctx, request);
+	}
+	
+	@POST
+	@Path("/vm/{id}/activity")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response addVMActivity(@PathParam("id") int id) {
+		return VirtualMachineService.addActivity(id, ctx);
 	}
 
 }

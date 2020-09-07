@@ -103,7 +103,7 @@
 
 
   <table class="table table-striped" id="main-table">
-  	<button class="btn btn-success" onclick="addVm()">Add new virtual machine</button>
+  	<button class="btn btn-success" id="add-new" onclick="addVm()">Add new virtual machine</button>
     <thead>
       <tr>
         <th>Name</th>
@@ -121,11 +121,11 @@
 <script>
 
 
+var loggedType = "";
  $(function() {
 
   restrict();
 
- 	var loggedType = "";
 	$.ajax({
 		type: "POST",
 		url: "rest/user/logged",
@@ -139,6 +139,9 @@
 		}
 	})
 
+  if(loggedType == "USER"){
+    $("#add-new").prop('disabled', true)
+  }
 
 
     $("#vms-list").empty();
@@ -158,7 +161,12 @@
           panel += '<td>' + vm.category.ram + '</td>';
           panel += '<td>' + vm.numberOfGpuCores + '</td>';
           panel += '<td><button class="btn btn-success" type="submit" onclick="editVM(&quot;' + vm.id + '&quot;)">EDIT-VIEW</button>';
-          panel += '<button class="btn btn-danger" type="submit" onclick="deleteVM(&quot;' + vm.id + '&quot;)">DELETE</button></td>';
+          if(loggedType != 'USER'){
+               panel += '<button class="btn btn-danger" type="submit" onclick="deleteVM(&quot;' + vm.id + '&quot;)">DELETE</button></td>';
+          }
+          else{
+             panel += '</td>'
+          }
           panel += '</tr>'
 
           panels += panel;

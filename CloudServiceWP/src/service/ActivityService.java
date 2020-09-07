@@ -31,7 +31,6 @@ public class ActivityService {
 		
 		// Obrisi tu aktivnost iz liste aktivnosti unuutar VM
 		for (Object key : vms.getVms().keySet()) {
-			System.out.println(key.getClass().toString());
 			Iterator i = vms.getVms().get(key).getActivities().iterator();
 			while (i.hasNext()) {
 				Activity a = (Activity) i.next();
@@ -43,6 +42,7 @@ public class ActivityService {
 
 			}
 		}
+		System.out.println("Cuvam");
 		VirtualMachineService.saveVirtualMachines(ctx, vms);
 		return Response.status(Response.Status.OK).build();
 	
@@ -63,7 +63,7 @@ public class ActivityService {
 
 	}
 
-	private static void saveActivities(ServletContext ctx, Activities activities) {
+	public static void saveActivities(ServletContext ctx, Activities activities) {
 		String path = ctx.getRealPath("") + "data/activities.txt".replace("/", System.getProperty("file.separator"));
 
 		String data = "";
@@ -98,7 +98,7 @@ public class ActivityService {
 		Activities activities = (Activities) ctx.getAttribute("activities");
 		if (activities == null) {
 			activities = loadActivities(ctx.getRealPath(""));
-			ctx.setAttribute("organizations", activities);
+			ctx.setAttribute("activities", activities);
 		}
 
 		return activities;

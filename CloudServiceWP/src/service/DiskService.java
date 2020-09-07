@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 
 import dto.DiskDTO;
+import dto.VirtualMachineDTO;
 import enums.DiskType;
 import enums.UserType;
 import model.Disk;
@@ -26,11 +27,10 @@ import model.VirtualMachine;
 import model.VirtualMachines;
 
 public class DiskService {
-	
+
 	private static BufferedWriter bw;
 	private static FileWriter fw;
 
-	
 	public static Disks getDisks(ServletContext ctx) {
 		Disks disks = (Disks) ctx.getAttribute("disks");
 		if (disks == null) {
@@ -115,60 +115,54 @@ public class DiskService {
 		User logged = (User) request.getSession().getAttribute("loggedUser");
 		if (logged.getUserType() == UserType.ADMIN) {
 			dto.setOrganizationId(logged.getOrganization().getId());
-		}
-		else if(logged.getUserType() == UserType.SUPERADMIN){
-			System.out.println("Korisnik je superadmin");			
-		}
-		else {
+		} else if (logged.getUserType() == UserType.SUPERADMIN) {
+			System.out.println("Korisnik je superadmin");
+		} else {
 			return Response.status(Response.Status.FORBIDDEN).build();
 		}
-		
-		if(dto.getName().equals("")) {
+
+		if (dto.getName().equals("")) {
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
-		
+
 		Disk disk = new Disk();
 		Disks disks = getDisks(ctx);
-		
-		
-		disk.setId(disks.getDisks().size() +1);
+
+		disk.setId(disks.getDisks().size() + 1);
 		disk.setName(dto.getName());
 		System.out.println(dto.getVmId());
-		
+
 		disk.setCapacity(dto.getCapacity());
 		disk.setOrganization(OrganizationService.getOrganizationByID(dto.getOrganizationId(), ctx));
-		if(dto.getDiskType() == 1) {
+		if (dto.getDiskType() == 1) {
 			disk.setDiskType(DiskType.HDD);
-		}
-		else {
+		} else {
 			disk.setDiskType(DiskType.SSD);
 		}
-		if(dto.getVmId() != -1) {
+		if (dto.getVmId() != -1) {
 			disk.setVmId(dto.getVmId());
 			VirtualMachineService.addDiskToMachine(disk, dto.getVmId(), ctx);
-		}
-		else {
+		} else {
 			disk.setVmId(-1);
 		}
 		disks.getDisks().put(disk.getId(), disk);
 		saveDisks(ctx, disks);
-		
+
 		return Response.status(Response.Status.CREATED).build();
-		
 
 	}
 
 	public static void removeVMfromDisk(int id, ServletContext ctx) {
 		Disks disks = getDisks(ctx);
 		for (Object key : disks.getDisks().keySet()) {
-			if(disks.getDisks().get(key).getVmId() == id) {
+			if (disks.getDisks().get(key).getVmId() == id) {
 				disks.getDisks().get(key).setVmId(-1);
 			}
 		}
-		
+
 		saveDisks(ctx, disks);
 		System.out.println("Disks updated.");
-		
+
 	}
 
 	public static Response deleteDisk(int diskId, ServletContext ctx, HttpServletRequest request) {
@@ -176,34 +170,64 @@ public class DiskService {
 		Disk disk = getDiskByID(diskId, ctx);
 		int vmId = disk.getVmId();
 		disks.getDisks().remove(String.valueOf(diskId));
-		if(vmId != -1) {
+		if (vmId != -1) {
 			VirtualMachineService.removeDiskFromMachine(vmId, diskId, ctx);
 		}
 		return Response.status(Response.Status.OK).build();
 	}
-	
 
 	public static Collection<Disk> getFreeDisks(ServletContext ctx, HttpServletRequest request) {
 		Disks disks = getDisks(ctx);
 		User logged = (User) request.getSession().getAttribute("loggedUser");
 		List<Disk> freeDisks = new ArrayList<Disk>();
-		if(logged.getUserType() == UserType.SUPERADMIN) {
+		if (logged.getUserType() == UserType.SUPERADMIN) {
 			for (Object key : disks.getDisks().keySet()) {
-				if(disks.getDisks().get(key).getVmId() == -1) {
+				if (disks.getDisks().get(key).getVmId() == -1) {
+					freeDisks.add(disks.getDisks().get(key));
+				}
+			}
+		} else if (logged.getUserType() == UserType.ADMIN) {
+			for (Object key : disks.getDisks().keySet()) {
+				if (disks.getDisks().get(key).getVmId() == -1
+						&& disks.getDisks().get(key).getOrganization().getId() == logged.getOrganization().getId()) {
 					freeDisks.add(disks.getDisks().get(key));
 				}
 			}
 		}
-		else if(logged.getUserType() == UserType.ADMIN) {
-			for (Object key : disks.getDisks().keySet()) {
-				if(disks.getDisks().get(key).getVmId() == -1 && disks.getDisks().get(key).getOrganization().getId() == logged.getOrganization().getId()) {
-					freeDisks.add(disks.getDisks().get(key));
-				}
-			}
-		}
-		
+
 		return freeDisks;
 	}
 
+	public static Response editDisk(DiskDTO dto, int id, HttpServletRequest request, ServletContext ctx) {
+		Disk disk = getDiskByID(id, ctx);
+		// ako neko polje nije popunjeno, vrati gresku
+		if (dto.getName().equals("")) {
+			return Response.status(Response.Status.BAD_REQUEST).build();
+		}
+
+		if (disk == null) {
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
+
+		disk.setName(dto.getName());
+		disk.setCapacity(dto.getCapacity());
+		if (dto.getDiskType() == 1) {
+			disk.setDiskType(DiskType.HDD);
+		} else if (dto.getDiskType() == 2) {
+			disk.setDiskType(DiskType.SSD);
+		}
+		if (disk.getVmId() == dto.getVmId()) {
+			VirtualMachineService.updateVmDisk(disk, dto.getVmId(), ctx);
+		} else {
+			VirtualMachineService.removeDiskFromMachine(disk.getVmId(), disk.getId(), ctx);
+			VirtualMachineService.addDiskToMachine(disk, dto.getVmId(), ctx);
+		}
+		disk.setVmId(dto.getVmId());
+		Disks disks = getDisks(ctx);
+		disks.getDisks().replace(disk.getId(), disk);
+		saveDisks(ctx, disks);
+
+		return Response.status(Response.Status.OK).build();
+	}
 
 }

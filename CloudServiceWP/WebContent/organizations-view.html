@@ -52,8 +52,23 @@
 <script>
 
 
+    var loggedType = "";
  $(function() {
     restrict()
+
+  $.ajax({
+    type: "POST",
+    url: "rest/user/logged",
+    dataType: "json",
+    success: function(logged) {
+      loggedType = logged.userType;
+    },
+    error: function(response, xhr) {
+      var logbar = '<li><a href="authentication.html"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>';
+      $("#log-bar").append(logbar);
+    }
+  })
+
     $("#organizations-list").empty();
 
     $.ajax({
@@ -71,7 +86,15 @@
           panel += '<td>' + organization.about + '</td>';
           panel += '<td>' + organization.logo + '</td>';
           panel += '<td><button class="btn btn-danger" type="submit" onclick="deleteOrganization(&quot;' + organization.id + '&quot;)">DELETE</button>';
-          panel += '<button class="btn btn-success" type="submit" onclick="editOrganization(&quot;' + organization.id + '&quot;)">EDIT</button></td>';
+
+          if(loggedType != 'USER'){
+               panel += '<button class="btn btn-success" type="submit" onclick="editOrganization(&quot;' + organization.id + '&quot;)">EDIT</button></td>';    
+          }
+          else{
+             panel += '</td>'
+          }
+
+         
           panel += '</tr>'
 
           panels += panel;

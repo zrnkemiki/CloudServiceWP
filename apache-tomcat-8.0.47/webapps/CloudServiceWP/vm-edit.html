@@ -80,6 +80,10 @@
                      <tbody id="activity-list">
                     </tbody>
                     </table>
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <input type="button" name="machine-state" id="machine-state" tabindex="4" class="form-control btn btn-warning" value="" onclick="powerMachine()">
+                      </div>
+                      <hr>
                   </div>
                   <div class="form-group">
                     <table class="table table-striped">
@@ -207,24 +211,48 @@ $(function() {
       	$("#category-list").prop('disabled', true)
       }
       $("#activity-list").empty();
+
       var panels = "";
       $.each(vm.activities, function(i, activity) {
-          var panel = "";
-          if(activity.dateOFF == undefined){
-            activity.dateOFF = "/"
+
+          // poslednja aktivnost
+          if (i == vm.activities.length - 1) {
+            if (activity.dateOFF == undefined) {
+              $("#machine-state").val("Turn Off");
+              $("#machine-state").removeClass("btn-warning");
+              $("#machine-state").addClass("btn-danger");
+              
+            } else {
+              $("#machine-state").val("Turn On");
+              $("#machine-state").removeClass("btn-danger");
+              $("#machine-state").addClass("btn-warning");
+            }
           }
+          var panel = "";
 
           panel += '<tr>'
-          panel += '<td>' + activity.dateON + '</td>';
-          panel += '<td>' + activity.dateOFF + '</td>';
+          panel += '<td>' + activity.dateON.split('T')[0] + " " + activity.dateON.split('T')[1]  + '</td>';
+          if (activity.dateOFF == undefined) {
+            panel += '<td>' + "MACHINE RUNNING" + '</td>';
+          } else {
+            panel += '<td>' + activity.dateOFF.split('T')[0] + " " + activity.dateOFF.split('T')[1] + '</td>';
+          }
+          
           if(loggedType == "SUPERADMIN"){
-          	 panel += '<td><button class="btn btn-danger" type="submit" onclick="deleteActivity(&quot;' + activity.id + '&quot;)">DELETE</button></td>';
+          	 panel += '<td><button class="btn btn-danger" onclick="deleteActivity(&quot;' + activity.id + '&quot;)">DELETE</button></td>';
           }
          
           panel += '</tr>'
 
           panels += panel;
         });
+
+      if (panels == "") {
+        $("#machine-state").val("Turn On");
+        $("#machine-state").removeClass("btn-danger");
+        $("#machine-state").addClass("btn-warning");
+      }
+
         $("#activity-list").append(panels);
          var panels2 = "";
       $.each(vm.disks, function(i, disk) {
@@ -245,18 +273,47 @@ $(function() {
   })
 })
 
+
+function powerMachine() {
+
+  $.ajax({
+    type: "POST",
+    url: "rest/vm/" + vmId + "/activity",
+    success: function(response) {
+      var state = $("#machine-state").val();
+      if (state == "Turn On") {
+        alert("Virtual Machine is ON!");
+        window.location.reload();
+      } else {
+        alert("Virtual Machine is OFF!");
+        window.location.reload();
+      }
+    },
+    error: function() {
+      alert("Something went wrong while changing state of the machine");
+      window.location.replace("vms-view.html");
+    }
+  })
+
+
+}
+
 function deleteActivity(activityId) {
-    console.log("Usao sam u delete activity");
-       $.ajax({
+      $.ajax({
       type: "DELETE",
       url: "rest/activity/" + activityId + "/delete",
       success: function() {
-        alert("Activity with id: " + activityId + " deleted successfully!")
-      	window.location.replace("vms-view.html");
+        console.log("OVO JE AAAAAAAAAAA");
+        alert("Activity with id: " + activityId + " deleted successfully!");
+      	window.location.reload();
       },
-      error: function(response) {
-        alert("Something went wrong while deleting vm!");
-        window.location.replace("vms-view.html");
+      error: function(xhr, status) {
+        console.log("OVO JE EROR");
+        if (xhr.status == 404) {
+          alert("Disk that you want to delete cannot be found!");
+        }
+        alert("Something went wrong while deleting Disk!");
+        window.location.replace("disks-view.html");
       }
     })
 
@@ -282,7 +339,6 @@ $("#edit-submit").click(function() {
   editedVM.name = name;
   editedVM.categoryId =category;
 
-  console.log(vmId);
   
   $.ajax({
     type: "POST",

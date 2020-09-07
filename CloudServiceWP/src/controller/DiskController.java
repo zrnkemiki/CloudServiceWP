@@ -76,9 +76,9 @@ public class DiskController {
 	@Path("/disk/{id}/edit")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response diskEdit(VirtualMachineDTO dto, @PathParam("id") int id) {
+	public Response diskEdit(DiskDTO dto, @PathParam("id") int id) {
 		System.out.println("Usao u Disk edit controller");
-		return VirtualMachineService.editVirtualMachine(dto, id, request, ctx);
+		return DiskService.editDisk(dto, id, request, ctx);
 	}
 	
 	@DELETE

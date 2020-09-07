@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -13,13 +14,14 @@ import java.util.List;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
-import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 
 import dto.VirtualMachineDTO;
 import enums.UserType;
+import model.Activities;
+import model.Activity;
 import model.Disk;
 import model.User;
 import model.VirtualMachine;
@@ -60,7 +62,8 @@ public class VirtualMachineService {
 	 * pregleda aktivnosti, ne moze da ih menja KORISNIK: moze samo da vidi VM ne
 	 * moze nista da menja
 	 */
-	public static Response editVirtualMachine(VirtualMachineDTO dto, int id, HttpServletRequest request, ServletContext ctx) {
+	public static Response editVirtualMachine(VirtualMachineDTO dto, int id, HttpServletRequest request,
+			ServletContext ctx) {
 		VirtualMachine vm = getVirtualMachineByID(id, ctx);
 		// ako neko polje nije popunjeno, vrati gresku
 		if (dto.getName().equals("")) {
@@ -76,11 +79,10 @@ public class VirtualMachineService {
 		vm.setNumberOfCores(vm.getCategory().getNumberOfCores());
 		vm.setNumberOfGpuCores(vm.getNumberOfGpuCores());
 		vm.setRam(vm.getRam());
-		
+
 		VirtualMachines vms = getVirtualMachines(ctx);
 		vms.getVms().replace(vm.getId(), vm);
 		saveVirtualMachines(ctx, vms);
-		
 
 		return Response.status(Response.Status.OK).build();
 	}
@@ -93,40 +95,36 @@ public class VirtualMachineService {
 		User logged = (User) request.getSession().getAttribute("loggedUser");
 		if (logged.getUserType() == UserType.ADMIN) {
 			dto.setOrganizationId(logged.getOrganization().getId());
-		}
-		else if(logged.getUserType() == UserType.SUPERADMIN){
+		} else if (logged.getUserType() == UserType.SUPERADMIN) {
 			System.out.println("Korisnik je super admin.");
-		}
-		else {
+		} else {
 			return Response.status(Response.Status.FORBIDDEN).build();
 		}
-		
-		if(dto.getName().equals("")) {
+
+		if (dto.getName().equals("")) {
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
-		
+
 		VirtualMachine vm = new VirtualMachine();
 		VirtualMachines vms = getVirtualMachines(ctx);
-		vm.setId(vms.getVms().size() +1);
+		vm.setId(vms.getVms().size() + 1);
 		vm.setName(dto.getName());
 		vm.setCategory(CategoryService.getCategoryByID(dto.getCategoryId(), ctx));
 		vm.setOrganization(OrganizationService.getOrganizationByID(dto.getOrganizationId(), ctx));
 		vm.setNumberOfCores(vm.getCategory().getNumberOfCores());
 		vm.setNumberOfGpuCores(vm.getCategory().getNumberOfGpuCores());
 		vm.setRam(vm.getCategory().getRam());
-		
-		
-		if(!dto.getDisks().isEmpty()) {
+
+		if (!dto.getDisks().isEmpty()) {
 			for (Integer i : dto.getDisks()) {
 				vm.getDisks().add(DiskService.getDiskByID(i, ctx));
 			}
 		}
 
 		vms.getVms().put(vm.getId(), vm);
-		
+
 		saveVirtualMachines(ctx, vms);
 		return Response.status(Response.Status.CREATED).build();
-		
 
 	}
 
@@ -215,13 +213,13 @@ public class VirtualMachineService {
 		Iterator i = vms.getVms().get(String.valueOf(vmId)).getDisks().iterator();
 		while (i.hasNext()) {
 			Disk d = (Disk) i.next();
-			if (d.getId() == diskId){
+			if (d.getId() == diskId) {
 				i.remove();
 			}
-		saveVirtualMachines(ctx, vms);
-		System.out.println("VMS Updated");
+			saveVirtualMachines(ctx, vms);
+			System.out.println("VMS Updated");
 		}
-		
+
 	}
 
 	public static boolean checkForCategoryConflict(int id, ServletContext ctx) {
@@ -229,12 +227,12 @@ public class VirtualMachineService {
 		VirtualMachines vms = getVirtualMachines(ctx);
 		Collection<VirtualMachine> collection = vms.getVms().values();
 		for (VirtualMachine virtualMachine : collection) {
-			if(virtualMachine.getCategory().getId() == id) {
+			if (virtualMachine.getCategory().getId() == id) {
 				return flag = true;
 			}
 		}
 		return flag;
-		
+
 	}
 
 	public static void addDiskToMachine(Disk disk, int vmId, ServletContext ctx) {
@@ -243,6 +241,69 @@ public class VirtualMachineService {
 		vm.getDisks().add(disk);
 		vms.getVms().replace(vm.getId(), vm);
 		saveVirtualMachines(ctx, vms);
+
+	}
+
+	public static VirtualMachine updateVmDisk(Disk disk, int vmId, ServletContext ctx) {
+		VirtualMachines vms = getVirtualMachines(ctx);
+		VirtualMachine vm = getVirtualMachineByID(vmId, ctx);
+		for (int i = 0; i < vm.getDisks().size(); i++) {
+			if (vm.getDisks().get(i).getId() == disk.getId()) {
+				vm.getDisks().remove(i);
+				vm.getDisks().add(disk);
+			}
+		}
+		vms.getVms().replace(vm.getId(), vm);
+		saveVirtualMachines(ctx, vms);
+		System.out.println("VMS Updated");
+		return vm;
+	}
+
+	
+	public static Response addActivity(int id, ServletContext ctx) {
+		
+		VirtualMachines vms = getVirtualMachines(ctx);
+		VirtualMachine vm = getVirtualMachineByID(id, ctx);
+		Activities activities = ActivityService.getActivities(ctx);
+		Activity newActivity = new Activity();
+		// ovo je prva aktivnost za VM
+		if (vm.getActivities().size() == 0) {
+			newActivity.setDateON(LocalDateTime.now());
+
+			// nema acitivites u celom sistemu
+			if (activities == null) {
+				newActivity.setId(1);
+			} else {
+				newActivity.setId(activities.getActivities().size() + 1);
+			}
+			
+			vm.getActivities().add(newActivity);
+			activities.getActivities().put(newActivity.getId(), newActivity);
+		// nije prva aktivnost za VM
+		} else {
+			Activity foundActivity = vm.getActivities().get(vm.getActivities().size() - 1);
+			// ako je postavljen samo ON --> postavi OFF
+			if (foundActivity.getDateOFF() == null) {
+				foundActivity.setDateOFF(LocalDateTime.now());
+				activities.getActivities().replace(foundActivity.getId(), foundActivity);
+				
+			// ako nije postavljen ni ON --> napravi novu
+			} else {
+				newActivity.setDateON(LocalDateTime.now());
+				newActivity.setId(activities.getActivities().size() + 1);
+				
+				vm.getActivities().add(newActivity);
+				activities.getActivities().put(newActivity.getId(), newActivity);
+			}	
+		}
+		
+		ActivityService.saveActivities(ctx, activities);
+		vms.getVms().replace(vm.getId(), vm);
+		saveVirtualMachines(ctx, vms);
+		
+		return Response.status(Response.Status.CREATED).build();
 		
 	}
+	
+
 }

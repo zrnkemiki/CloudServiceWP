@@ -37,7 +37,7 @@
   <h2>CloudServiceWP</h2>
   <input class="search-input" type="text" id="search-box" onkeyup="search()" placeholder="Search.." title="Type in a name">           
   <table class="table table-striped" id="main-table">
-  	<button class="btn btn-success" onclick="addVm()">Add new disk</button>
+  	<button class="btn btn-success" id="add-new" onclick="addVm()">Add new disk</button>
     <thead>
       <tr>
         <th>Name</th>
@@ -54,11 +54,11 @@
 
 
 var vmsList = [];
+var loggedType = "";
 
  $(function() {
   restrict()
 
- 	var loggedType = "";
 	$.ajax({
 		type: "POST",
 		url: "rest/user/logged",
@@ -72,13 +72,16 @@ var vmsList = [];
 		}
 	})
 
+  if(loggedType == "USER"){
+    $("#add-new").prop('disabled', true)
+  }
+
     $.ajax({
       type: "GET",
       url: "rest/vms/all",
       dataType: "json",
       success: function(vms) {
         vmsList = vms;
-        console.log(vmsList);
         getDisks(vmsList);
       },
       error: function(response) {
@@ -105,14 +108,22 @@ var vmsList = [];
           panel += '<td>' + disk.capacity + '</td>';
           vmsList.forEach(searchFun);
           function searchFun(value, index, array){
-            console.log(value)
             if(value.id == disk.vmId){
               vmName = value.name;
             }
           }
           panel += '<td>' + vmName + '</td>';
           panel += '<td><button class="btn btn-success" type="submit" onclick="editDisk(&quot;' + disk.id + '&quot;)">EDIT-VIEW</button>';
-          panel += '<button class="btn btn-danger" type="submit" onclick="deleteDisk(&quot;' + disk.id + '&quot;)">DELETE</button></td>';
+          if(loggedType != 'USER'){
+              panel += '<button class="btn btn-danger" type="submit" onclick="deleteDisk(&quot;' + disk.id + '&quot;)">DELETE</button></td>';
+
+          }
+          else{
+             panel += '</td>'
+          }
+
+
+         
           panel += '</tr>'
 
           panels += panel;

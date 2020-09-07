@@ -37,7 +37,6 @@ function printNav(page) {
 									+ '">My organization</a></li>';
 							navItems += '<li><a href="vms-view.html">View Virtual machines</a></li>';
 							navItems += '<li><a href="disks-view.html">View Disks</a></li>';
-							navItems += '<li><a href="categories-view.html">View Categories</a></li>';
 							$("#myNavbarList").append(navItems);
 						}
 					} else if (loggedType == "USER") {
@@ -45,6 +44,7 @@ function printNav(page) {
 								|| page == "vms-view.html") {
 							navItems += '<li><a href="my-profile.html">My Profile</a></li>';
 							navItems += '<li><a href="vms-view.html">View Virtual machines</a></li>';
+							navItems += '<li><a href="disks-view.html">View Disks</a></li>';
 							$("#myNavbarList").append(navItems);
 						}
 					}

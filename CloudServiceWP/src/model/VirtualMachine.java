@@ -33,6 +33,7 @@ public class VirtualMachine {
 		this.numberOfGpuCores = numberOfGpuCores;
 		this.disks = disks;
 		this.activities = activities;
+		
 	}
 
 

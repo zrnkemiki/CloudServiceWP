@@ -51,7 +51,6 @@
                     <input type="text" name="name-edit" id="name-edit" tabindex="1" class="form-control" placeholder="Name" value="">
                   </div>
                   <div class="form-group">
-                     
                         <label>Choose disk capacity:</label>
                           <select name="type" id="capacity-edit">
                             <option value="1">1 TB</option>
@@ -59,14 +58,11 @@
                             <option value="4">4 TB</option>
                             <option value="6">6 TB</option>
                           </select>
-                      
                   </div>
                   <div class="form-group">
-                    
           					   <label>Choose virtual machine:</label>
           					  	<select name="type" id="vms-list">
                         </select>
-          					
                   </div>
                   <div>
                     <form>
@@ -80,7 +76,7 @@
                   <div class="form-group">
                     <div class="row">
                        <div class="col-sm-6 col-sm-offset-3">
-                        <input type="button" name="edit-submit" id="edit-submit" tabindex="4" class="form-control btn btn-register" value="ADD Disk">
+                        <input type="button" name="edit-submit" id="edit-submit" tabindex="4" class="form-control btn btn-register" value="Update Disk">
                       </div>
                     </div>
                   </div>
@@ -105,34 +101,11 @@
 
 var vmsList = [];
 var organizationList = [];
+var diskId = '';
+var loggedType = '';
 
 $(function() {
 
-  const queryString = window.location.search;
-  const urlParams = new URLSearchParams(queryString);
-  diskId = urlParams.get('id')
-  console.log("Ovo je id diska"+ diskId);
-  $.ajax({
-    type: "GET",
-    url: "rest/disk/"+ diskId,
-    dataType: "json",
-    success: function(disk) {
-      $("#name-edit").val(disk.name);
-      $("#capacity-edit").val(disk.capacity);
-      if(disk.diskType == "HDD"){
-        $("#disk-type").val(1);
-      }
-      else if(disk.diskType == "SSD"){
-        $("#disk-type").val(2);
-      }
-      $("#vms-list").val(disk.vmId);
-    },
-    error: function(response) {
-      
-    }
-  })
-
-  var loggedType = "";
   $.ajax({
     type: "POST",
     url: "rest/user/logged",
@@ -148,6 +121,45 @@ $(function() {
     }
   })
 
+
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+  diskId = urlParams.get('id');
+  $.ajax({
+    type: "GET",
+    url: "rest/disk/"+ diskId,
+    dataType: "json",
+    success: function(disk) {
+      $("#name-edit").val(disk.name);
+      if(loggedType == 'USER'){
+        $("#name-edit").prop('disabled', true)
+        $("#edit-submit").prop('disabled', true)
+      }
+      $("#capacity-edit").val(disk.capacity);
+      if(loggedType == 'USER'){
+        $("#capacity-edit").prop('disabled', true)
+      }
+      $("#vms-list").val(disk.vmId);
+      if(loggedType == 'USER'){
+        $("#vms-list").prop('disabled', true)
+      }
+      if(disk.diskType == "HDD"){
+        $("#disk-type").val(1);
+      }
+      else if(disk.diskType == "SSD"){
+        $("#disk-type").val(2);
+      }
+
+      if(loggedType == 'USER'){
+        $("#disk-type").prop('disabled', true)
+      }
+    },
+    error: function(response) {
+      
+    }
+  })
+
+  
 	 $("#vms-list").empty();
 
     $.ajax({
@@ -156,7 +168,6 @@ $(function() {
       dataType: "json",
       success: function(vms) {
         var panels = "";
-       	console.log("Ovo su vms" + vms);
           var panel = "";
           panel += '<option value=' + -1 + '>' + 'NO VM' + '</option>';
         $.each(vms, function(i, vm) {
@@ -179,14 +190,17 @@ $(function() {
 });
 
 $("#edit-submit").click(function() {
-  var newDisk = {};
+  var editedDisk = {};
   var name = $("#name-edit").val();
   var vmId = $("#vms-list").val();
   var capacity = $("#capacity-edit").val()
   var organizationId = $("#organization-list").val()
   var diskType = $("#disk-type").val()
  
-  debugger;
+  if(name == ""){
+     $("#name-edit").css('border', '1px solid red').css('background', 'pink');
+  }
+
   if (name == "" || organizationId == "" || diskType == "") {
       alert("Please fill in the entire form!");
       return;
@@ -194,20 +208,20 @@ $("#edit-submit").click(function() {
   
 
   
-  newDisk.name = name;
-  newDisk.vmId =vmId;
-  newDisk.capacity = capacity;
-  newDisk.organizationId = organizationId;
-  newDisk.diskType = diskType;
+  editedDisk.name = name;
+  editedDisk.vmId =vmId;
+  editedDisk.capacity = capacity;
+  editedDisk.organizationId = organizationId;
+  editedDisk.diskType = diskType;
 
   
   $.ajax({
     type: "POST",
-    url: "rest/disk/add",
+    url: "rest/disk/" + diskId + "/edit",
     contentType: "application/json",
-    data: JSON.stringify(newDisk),
+    data: JSON.stringify(editedDisk),
     success: function(response) {
-      alert("Disk added!");
+      alert("Disk updated!");
       window.location.replace("disks-view.html");
     },
     error: function(response, xhr) {
@@ -216,9 +230,7 @@ $("#edit-submit").click(function() {
         alert("Please fill in the entire form correctly!");
       } else if (xhr == 404) {
         alert("Sorry! Not been found in the system");
-      } else if (xhr == 409) {
-        alert("Disk with selected ID exists, change ID right now!!!");
-      }
+      } 
       window.location.reload();
     }
   })

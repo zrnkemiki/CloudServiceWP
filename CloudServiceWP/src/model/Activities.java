@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class Activities {
 
-	private HashMap<Integer, Activity> activities = new HashMap<Integer, Activity>();
+	private HashMap<Integer, Activity> activities; 
 
 	public Activities(HashMap<Integer, Activity> activities) {
 		super();
@@ -12,8 +12,7 @@ public class Activities {
 	}
 
 	public Activities() {
-		super();
-		// TODO Auto-generated constructor stub
+		activities = new HashMap<Integer, Activity>();
 	}
 
 	public HashMap<Integer, Activity> getActivities() {
