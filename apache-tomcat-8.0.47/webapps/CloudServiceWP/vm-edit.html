@@ -142,10 +142,11 @@
 
   
 
+var vmId = "";
 
 $(function() {
     restrict()
-	
+	  
 
     $.ajax({
       type: "GET",
@@ -168,11 +169,6 @@ $(function() {
       }
     })
 
-});
-
-var vmId = "";
-
-$(function() {
 	var loggedType = "";
 	$.ajax({
 		type: "POST",
@@ -209,7 +205,8 @@ $(function() {
       	$("#category-list").prop('disabled', true)
       }
       $("#activity-list").empty();
-
+      debugger;
+      setCategoryValues(vm.category.id);
       var panels = "";
       $.each(vm.activities, function(i, activity) {
 
@@ -269,6 +266,7 @@ $(function() {
       
     }
   })
+
 })
 
 

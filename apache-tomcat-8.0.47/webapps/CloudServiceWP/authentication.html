@@ -88,7 +88,7 @@
           dataType: "json",
           success: function(loggedUser) {
               alert("Logged in user:  " + loggedUser.email);
-              window.location.replace("index.html");
+              window.location.replace("vms-view.html");
           },
           error: function(response) {
               if (response.status == '403') {
