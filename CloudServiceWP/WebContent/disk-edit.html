@@ -106,6 +106,28 @@ var loggedType = '';
 
 $(function() {
 
+
+    $.ajax({
+      type: "GET",
+      url: "rest/vms/all",
+      dataType: "json",
+      success: function(vms) {
+        var panels = "";
+          var panel = "";
+          panel += '<option value=' + -1 + '>' + 'NO VM' + '</option>';
+        $.each(vms, function(i, vm) {
+          panel += '<option value=' + vm.id + '>' + vm.name + '</option>';
+          panels += panel;
+          panel = "";
+        });
+        vmsList = vms;
+        $("#vms-list").append(panels);
+      },
+      error: function(response) {
+        alert("Something went wrong while getting vms!");
+      }
+    })
+
   $.ajax({
     type: "POST",
     url: "rest/user/logged",
@@ -139,6 +161,7 @@ $(function() {
       if(loggedType == 'USER'){
         $("#capacity-edit").prop('disabled', true)
       }
+      debugger;
       $("#vms-list").val(disk.vmId);
       if(loggedType == 'USER'){
         $("#vms-list").prop('disabled', true)
@@ -160,28 +183,7 @@ $(function() {
   })
 
   
-	 $("#vms-list").empty();
-
-    $.ajax({
-      type: "GET",
-      url: "rest/vms/all",
-      dataType: "json",
-      success: function(vms) {
-        var panels = "";
-          var panel = "";
-          panel += '<option value=' + -1 + '>' + 'NO VM' + '</option>';
-        $.each(vms, function(i, vm) {
-          panel += '<option value=' + vm.id + '>' + vm.name + '</option>';
-          panels += panel;
-          panel = "";
-        });
-        vmsList = vms;
-        $("#vms-list").append(panels);
-      },
-      error: function(response) {
-        alert("Something went wrong while getting vms!");
-      }
-    })
+	 
 
   
 

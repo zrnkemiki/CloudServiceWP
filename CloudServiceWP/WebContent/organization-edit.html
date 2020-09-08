@@ -135,7 +135,7 @@ $("#edit-submit").click(function() {
     data: JSON.stringify(editedOrganization),
     success: function(response) {
       alert("Organization updated!");
-      window.location.replace("index.html");
+      window.location.replace("organizations-view.html");
     },
     error: function(response, xhr) {
       console.log("usao u error????");

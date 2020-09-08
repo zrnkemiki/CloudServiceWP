@@ -23,7 +23,7 @@
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
-        <li class="active"><a href="my-profile.html">Profile</a></li>
+        <li class="active"><a href="users-view.html">Users</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><a onclick="logout()" id="logout-btn"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
@@ -98,8 +98,8 @@
         if (xhr.status == 404) {
           alert("User that you want to delete cannot be found!");
         }
-        alert("Something went wrong while deleting vm!");
-        window.location.replace("vms-view.html");
+        alert("Something went wrong while deleting User!");
+        window.location.replace("users-view.html");
       }
     })
 

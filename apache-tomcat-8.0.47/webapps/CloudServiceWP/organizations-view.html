@@ -85,15 +85,10 @@
           panel += '<td>' + organization.name + '</td>';
           panel += '<td>' + organization.about + '</td>';
           panel += '<td>' + organization.logo + '</td>';
-          panel += '<td><button class="btn btn-danger" type="submit" onclick="deleteOrganization(&quot;' + organization.id + '&quot;)">DELETE</button>';
 
           if(loggedType != 'USER'){
-               panel += '<button class="btn btn-success" type="submit" onclick="editOrganization(&quot;' + organization.id + '&quot;)">EDIT</button></td>';    
+               panel += '<td><button class="btn btn-success" type="submit" onclick="editOrganization(&quot;' + organization.id + '&quot;)">EDIT</button></td>';    
           }
-          else{
-             panel += '</td>'
-          }
-
          
           panel += '</tr>'
 
